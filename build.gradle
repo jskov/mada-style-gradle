@@ -1,0 +1,14 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'eclipse'
+}
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = 'dk.mada.style'
+            implementationClass = 'dk.mada.style.StylePlugin'
+        }
+    }
+}
+
