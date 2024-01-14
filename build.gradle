@@ -1,14 +1,21 @@
 plugins {
-    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '1.2.1'
     id 'eclipse'
 }
 
+group = 'dk.mada.style'
+version = '0.0.0-SNAPSHOT'
+
 gradlePlugin {
+    website = 'https://github.com/jskov/mada-style-gradle'
+    vcsUrl = 'https://github.com/jskov/mada-style-gradle'
     plugins {
-        simplePlugin {
+        stylePlugin {
             id = 'dk.mada.style'
-            implementationClass = 'dk.mada.style.StylePlugin'
+            displayName = 'Plugin for enforcing java dk.mada coding style'
+            description = 'A plugin that sets up null-checking and code formatting style for dk.mada development.'
+            tags.set(['error-prone', 'nullaway', 'checkstyle', 'spotless', 'style'])
+            implementationClass = 'dk.mada.style.MadaStylePlugin'
         }
     }
 }
-
