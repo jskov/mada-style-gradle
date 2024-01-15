@@ -14,22 +14,13 @@ dependencies {
     implementation "com.diffplug.spotless:spotless-plugin-gradle:6.23.3"
 }
 
-String digest(File f) {
-    byte[] b = f.readBytes()
-    byte[] d = java.security.MessageDigest.getInstance("SHA-256").digest(b)
-    println d
-    String h = java.util.HexFormat.of().formatHex(d)
-    println h
-    return h
-}
-
+// Checksum each configuration file so it is easy for the plugin to reason about their state
 processResources {
     filesMatching('config/datafile-checksums.properties') {
         def eclipseFormatterMadaChecksum = digest(file('src/main/resources/config/spotless/eclipse-formatter-mada.xml'))
         filter { l -> l.replace('@ECLIPSE_FORMATTER_MADA@', eclipseFormatterMadaChecksum) }
     }
 }
-
 
 gradlePlugin {
     website = 'https://github.com/jskov/mada-style-gradle'
@@ -46,3 +37,9 @@ gradlePlugin {
 }
 
 tasks.eclipse.doLast { project.mkdir("build/pluginUnderTestMetadata") }
+
+String digest(File f) {
+    byte[] b = f.readBytes()
+    byte[] d = java.security.MessageDigest.getInstance("SHA-256").digest(b)
+    return java.util.HexFormat.of().formatHex(d)
+}

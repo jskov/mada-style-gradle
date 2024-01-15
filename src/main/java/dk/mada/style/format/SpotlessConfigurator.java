@@ -1,11 +1,6 @@
 package dk.mada.style.format;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Properties;
 
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.logging.Logger;
@@ -13,50 +8,18 @@ import org.gradle.api.logging.Logger;
 import com.diffplug.gradle.spotless.JavaExtension;
 import com.diffplug.gradle.spotless.SpotlessExtension;
 
+import dk.mada.style.config.ConfigFileExtractor;
+
 public class SpotlessConfigurator {
+    private final Logger logger;
     private final FormatterConfig config;
-    private final File gradleHomeDir;
+    private final Path defaultConfigFile;
     
-    public SpotlessConfigurator(Logger logger, File gradleHomeDir, Properties dataChecksums, FormatterConfig config) {
+    public SpotlessConfigurator(Logger logger, ConfigFileExtractor configExtractor, FormatterConfig config) {
+        this.logger = logger;
         this.config = config;
-        this.gradleHomeDir = gradleHomeDir;
 
-        logger.lifecycle("See {}", config);
-        
-        getLocalConfigFile(gradleHomeDir, dataChecksums, "spotless/eclipse-formatter-mada.xml");
-    }
-
-    private Path getLocalConfigFile(File gradleHomeDir, Properties dataChecksums, String name) {
-        Path madaConfigDir = gradleHomeDir.toPath().resolve("mada-data");
-        try {
-            String value = dataChecksums.getProperty(name);
-            if (value == null) {
-                throw new IllegalStateException("Failed to read " + name + " from data checksums: " + dataChecksums);
-            }
-    
-            
-            Path targetFile = madaConfigDir.resolve(name.replace('/', ':') + "-" + value);
-            Path markerFile = madaConfigDir.resolve(targetFile.getFileName().toString() + ".valid");
-            if (Files.exists(markerFile)) {
-                return targetFile;
-            }
-            Files.createDirectories(madaConfigDir);
-            Files.deleteIfExists(targetFile);
-
-            String resourcePath = "/config/" + name;
-            try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
-                if (is == null) {
-                    throw new IllegalStateException("Failed to read config file " + resourcePath);
-                }
-                Files.copy(is, targetFile);
-                Files.createFile(markerFile);
-                System.out.println("XXXXXX created " + targetFile);
-            }
-            
-            return targetFile;
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to copy config file " + name + " to " + madaConfigDir, e);
-        }
+        defaultConfigFile = configExtractor.getLocalConfigFile("spotless/eclipse-formatter-mada.xml");
     }
 
     public void configure(SpotlessExtension se) {
@@ -68,11 +31,18 @@ public class SpotlessConfigurator {
         je.targetExclude(config.getExclude());
         je.formatAnnotations();
         
+        je.eclipse().configFile(getActiveConfigfile());
+    }
+
+    private Path getActiveConfigfile() {
+        Path useConfig;
         RegularFile eclipseConfig = config.getEclipseConfig().getOrNull();
         if (eclipseConfig == null) {
-            
+            useConfig = defaultConfigFile;
+        } else {
+            useConfig = eclipseConfig.getAsFile().toPath();
         }
-        
-        je.eclipse().configFile(null);
+        logger.lifecycle("Use spotless config: {}", useConfig);
+        return useConfig;
     }
 }

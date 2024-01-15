@@ -17,7 +17,7 @@ public abstract class FormatterConfig {
     
     public abstract RegularFileProperty getEclipseConfig();
 
-    public FormatterConfig() {
+    public FormatterConfig() { // NOSONAR - must be public, or Groovy/Gradle does not see it
         getEnabled().set(true);
         
         // Only format main code - must see how it behaves with test CSV
