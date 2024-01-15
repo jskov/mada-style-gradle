@@ -10,6 +10,7 @@ import com.diffplug.gradle.spotless.SpotlessPlugin;
 
 import dk.mada.style.config.ConfigFileExtractor;
 import dk.mada.style.format.SpotlessConfigurator;
+import dk.mada.style.nullcheck.ErrorProneConfigurator;
 import net.ltgt.gradle.errorprone.ErrorPronePlugin;
 
 /**
@@ -48,7 +49,11 @@ public class MadaStylePlugin implements Plugin<Project> {
         }
 
         if (Boolean.TRUE.equals(ext.getNullChecker().getEnabled().get())) {
-            project.getPlugins().withType(ErrorPronePlugin.class, ep -> logger.lifecycle("configure errorprone!"));
+            project.getPlugins().withType(ErrorPronePlugin.class, ep -> {
+                logger.lifecycle("configure errorprone!");
+                new ErrorProneConfigurator(project, configExtractor, ext.getNullChecker()).configure();
+            });
+
             project.getPluginManager().apply("net.ltgt.errorprone");
         }
     }
