@@ -35,6 +35,11 @@ public class SpotlessConfigurator {
         defaultConfigFile = configExtractor.getLocalConfigFile("spotless/eclipse-formatter-mada.xml");
     }
 
+    /**
+     * Configures the spotless extension.
+     *
+     * @param se the spotless extension
+     */
     public void configure(SpotlessExtension se) {
         se.java(this::configureJava);
     }

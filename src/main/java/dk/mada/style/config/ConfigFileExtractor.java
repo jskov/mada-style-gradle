@@ -46,7 +46,6 @@ public final class ConfigFileExtractor {
      * {@return a local file for the given configuration resource path}
      *
      * @param path the resource path
-     * @return a local file containing created from the resource path
      */
     public Path getLocalConfigFile(String path) {
         Path madaConfigDir = gradleHomeDir.resolve("mada-data");

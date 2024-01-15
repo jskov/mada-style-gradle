@@ -12,6 +12,9 @@ import com.diffplug.gradle.spotless.SpotlessPlugin;
 import dk.mada.style.config.ConfigFileExtractor;
 import dk.mada.style.format.SpotlessConfigurator;
 
+/**
+ * A plugin defining the style used for dk.mada java code.
+ */
 public class MadaStylePlugin implements Plugin<Project> {
     /** The Gradle logger.*/
     private Logger logger;
