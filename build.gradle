@@ -1,0 +1,45 @@
+plugins {
+    id 'com.gradle.plugin-publish' version '1.2.1'
+    id 'eclipse'
+    id 'dk.mada.style' version '0.0.1'
+}
+
+group = 'dk.mada.style'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "com.diffplug.spotless:spotless-plugin-gradle:6.24.0"
+}
+
+// Checksum each configuration file so it is easy for the plugin to reason about their state
+processResources {
+    filesMatching('config/datafile-checksums.properties') {
+        def eclipseFormatterMadaChecksum = digest(file('src/main/resources/config/spotless/eclipse-formatter-mada.xml'))
+        filter { l -> l.replace('@ECLIPSE_FORMATTER_MADA@', eclipseFormatterMadaChecksum) }
+    }
+}
+
+gradlePlugin {
+    website = 'https://github.com/jskov/mada-style-gradle'
+    vcsUrl = 'https://github.com/jskov/mada-style-gradle'
+    plugins {
+        stylePlugin {
+            id = 'dk.mada.style'
+            displayName = 'Plugin for enforcing java dk.mada coding style'
+            description = 'A plugin that sets up null-checking and code formatting style for dk.mada development.'
+            tags.set(['error-prone', 'nullaway', 'checkstyle', 'spotless', 'style'])
+            implementationClass = 'dk.mada.style.MadaStylePlugin'
+        }
+    }
+}
+
+tasks.eclipse.doLast { project.mkdir("build/pluginUnderTestMetadata") }
+
+String digest(File f) {
+    byte[] b = f.readBytes()
+    byte[] d = java.security.MessageDigest.getInstance("SHA-256").digest(b)
+    return java.util.HexFormat.of().formatHex(d)
+}
