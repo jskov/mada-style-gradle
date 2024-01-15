@@ -13,12 +13,10 @@ import org.gradle.api.logging.Logger;
  *
  * Some plugins/tasks need input in the form of a file instead of an InputStream.
  *
- * This extractor helps make local copies of those files in the Gradle home folder.
- * The configuration files are extracted named with their checksum to avoid extracting
- * more than one instance per (dk.mada.style-)plugin version.
+ * This extractor helps make local copies of those files in the Gradle home folder. The configuration files are
+ * extracted named with their checksum to avoid extracting more than one instance per (dk.mada.style-)plugin version.
  *
- * The checksum used is computed by the build process, made available in the resource
- * CHECKSUMS_PROPERTIES.
+ * The checksum used is computed by the build process, made available in the resource CHECKSUMS_PROPERTIES.
  */
 public final class ConfigFileExtractor {
     /** The checksum properties resource path. */
@@ -32,13 +30,13 @@ public final class ConfigFileExtractor {
     /**
      * Constructs a new instance.
      *
-     * @param logger the gradle logger
+     * @param logger        the gradle logger
      * @param gradleHomeDir the gradle home dir
      */
     public ConfigFileExtractor(Logger logger, Path gradleHomeDir) {
         this.logger = logger;
         this.gradleHomeDir = gradleHomeDir;
-        
+
         this.dataChecksums = readDatafileChecksums();
     }
 
@@ -54,7 +52,7 @@ public final class ConfigFileExtractor {
             if (value == null) {
                 throw new IllegalStateException("Failed to read " + path + " from data checksums: " + dataChecksums);
             }
-    
+
             String suffix = "." + path.replaceAll(".*[.]", "");
             String filename = path.replace('/', ':').replace(suffix, "") + "-" + value + suffix;
 

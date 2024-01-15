@@ -16,7 +16,7 @@ import dk.mada.style.format.SpotlessConfigurator;
  * A plugin defining the style used for dk.mada java code.
  */
 public class MadaStylePlugin implements Plugin<Project> {
-    /** The Gradle logger.*/
+    /** The Gradle logger. */
     private Logger logger;
     /** The style extension. */
     private MadaStylePluginExtension ext;
@@ -29,17 +29,14 @@ public class MadaStylePlugin implements Plugin<Project> {
         ext = project.getExtensions().create("mada", MadaStylePluginExtension.class);
 
         configExtractor = new ConfigFileExtractor(logger, project.getGradle().getGradleHomeDir().toPath());
-        
+
         ext.getNullcheckingEnabled().convention(true);
 
         PluginContainer plugins = project.getPlugins();
-        
-        plugins.withType(JavaPlugin.class, jp ->
-            project.afterEvaluate(this::configure)
-        );
+
+        plugins.withType(JavaPlugin.class, jp -> project.afterEvaluate(this::configure));
     }
-    
-    
+
     private void configure(Project p) {
         if (Boolean.TRUE.equals(ext.getNullcheckingEnabled().get())) {
             enableNullchecking(p);
@@ -58,7 +55,7 @@ public class MadaStylePlugin implements Plugin<Project> {
         });
 
         p.getPluginManager().apply("com.diffplug.spotless");
-}
+    }
 
     private void enableNullchecking(Project p) {
     }

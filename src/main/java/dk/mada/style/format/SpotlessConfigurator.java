@@ -24,7 +24,7 @@ public class SpotlessConfigurator {
     /**
      * Creates new instance.
      *
-     * @param logger the gradle logger
+     * @param logger          the gradle logger
      * @param configExtractor the configuration extractor
      * @param formatterConfig the formatter configuration
      */
