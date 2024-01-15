@@ -56,8 +56,11 @@ public final class ConfigFileExtractor {
                 throw new IllegalStateException("Failed to read " + path + " from data checksums: " + dataChecksums);
             }
     
-            Path targetFile = madaConfigDir.resolve(path.replace('/', ':') + "-" + value);
-            Path markerFile = madaConfigDir.resolve(targetFile.getFileName().toString() + ".valid");
+            String suffix = "." + path.replaceAll(".*[.]", "");
+            String filename = path.replace('/', ':').replace(suffix, "") + "-" + value + suffix;
+
+            Path targetFile = madaConfigDir.resolve(filename);
+            Path markerFile = madaConfigDir.resolve(filename + ".valid");
             if (Files.exists(markerFile)) {
                 logger.debug("Already have config file {} : {}", path, targetFile);
                 return targetFile;

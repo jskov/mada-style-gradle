@@ -10,14 +10,27 @@ import com.diffplug.gradle.spotless.SpotlessExtension;
 
 import dk.mada.style.config.ConfigFileExtractor;
 
+/**
+ * Configures Spotless with formatter preferences.
+ */
 public class SpotlessConfigurator {
+    /** The gradle logger. */
     private final Logger logger;
-    private final FormatterConfig config;
+    /** The formatter configuration. */
+    private final FormatterConfig formatterConfig;
+    /** The default configuration file, shipped with this plugin. */
     private final Path defaultConfigFile;
-    
-    public SpotlessConfigurator(Logger logger, ConfigFileExtractor configExtractor, FormatterConfig config) {
+
+    /**
+     * Creates new instance.
+     *
+     * @param logger the gradle logger
+     * @param configExtractor the configuration extractor
+     * @param formatterConfig the formatter configuration
+     */
+    public SpotlessConfigurator(Logger logger, ConfigFileExtractor configExtractor, FormatterConfig formatterConfig) {
         this.logger = logger;
-        this.config = config;
+        this.formatterConfig = formatterConfig;
 
         defaultConfigFile = configExtractor.getLocalConfigFile("spotless/eclipse-formatter-mada.xml");
     }
@@ -27,22 +40,27 @@ public class SpotlessConfigurator {
     }
 
     private void configureJava(JavaExtension je) {
-        je.target(config.getInclude());
-        je.targetExclude(config.getExclude());
+        String include = formatterConfig.getInclude().get();
+        String exclude = formatterConfig.getExclude().get();
+        Path configFile = getActiveConfigfile();
+        logger.info("Spotless java config: {}", configFile);
+        logger.info("Spotless java include:{} exclude:{}", include, exclude);
+
+        je.target(include);
+        je.targetExclude(exclude);
         je.formatAnnotations();
-        
-        je.eclipse().configFile(getActiveConfigfile());
+
+        je.eclipse().configFile(configFile);
     }
 
     private Path getActiveConfigfile() {
         Path useConfig;
-        RegularFile eclipseConfig = config.getEclipseConfig().getOrNull();
+        RegularFile eclipseConfig = formatterConfig.getEclipseConfig().getOrNull();
         if (eclipseConfig == null) {
             useConfig = defaultConfigFile;
         } else {
             useConfig = eclipseConfig.getAsFile().toPath();
         }
-        logger.lifecycle("Use spotless config: {}", useConfig);
         return useConfig;
     }
 }
