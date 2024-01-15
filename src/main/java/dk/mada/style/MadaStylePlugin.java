@@ -10,6 +10,7 @@ import com.diffplug.gradle.spotless.SpotlessPlugin;
 
 import dk.mada.style.config.ConfigFileExtractor;
 import dk.mada.style.format.SpotlessConfigurator;
+import net.ltgt.gradle.errorprone.ErrorPronePlugin;
 
 /**
  * A plugin defining the style used for dk.mada java code.
@@ -41,16 +42,22 @@ public class MadaStylePlugin implements Plugin<Project> {
      */
     private void configure(Project project) {
         if (Boolean.TRUE.equals(ext.getFormatter().getEnabled().get())) {
-            project.getPlugins().withType(SpotlessPlugin.class, sp -> configureFormatter(project));
+            project.getPlugins().withType(SpotlessPlugin.class, sp -> lazyConfigureFormatter(project));
+
+            project.getPluginManager().apply("com.diffplug.spotless");
+        }
+
+        if (Boolean.TRUE.equals(ext.getNullChecker().getEnabled().get())) {
+            project.getPlugins().withType(ErrorPronePlugin.class, ep -> logger.lifecycle("configure errorprone!"));
+            project.getPluginManager().apply("net.ltgt.errorprone");
         }
     }
 
-    private void configureFormatter(Project project) {
+    private void lazyConfigureFormatter(Project project) {
         project.getExtensions().configure(SpotlessExtension.class, se -> {
             logger.info("Configure spotless extension");
             new SpotlessConfigurator(logger, configExtractor, ext.getFormatter()).configure(se);
         });
 
-        project.getPluginManager().apply("com.diffplug.spotless");
     }
 }

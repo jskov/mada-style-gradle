@@ -4,7 +4,7 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 
 /**
- * DSL container for specification of client generation.
+ * DSL container for formatter configuration.
  */
 public abstract class FormatterConfig {
     /** {@return a flag to control the activation of the formatter} */
