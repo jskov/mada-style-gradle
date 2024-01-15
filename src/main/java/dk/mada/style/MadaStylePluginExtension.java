@@ -1,7 +1,6 @@
 package dk.mada.style;
 
 import org.gradle.api.Action;
-import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Nested;
 
 import dk.mada.style.format.FormatterConfig;
@@ -10,9 +9,6 @@ import dk.mada.style.format.FormatterConfig;
  * Extension for the dk.mada Style plugin.
  */
 public abstract class MadaStylePluginExtension {
-    /** {@return flag for enabling null-checking} */
-    public abstract Property<Boolean> getNullcheckingEnabled();
-
     /** {@return the formatter configuration} */
     @Nested
     public abstract FormatterConfig getFormatter();

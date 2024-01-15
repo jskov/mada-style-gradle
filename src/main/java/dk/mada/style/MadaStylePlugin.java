@@ -4,7 +4,6 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.plugins.PluginContainer;
 
 import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.gradle.spotless.SpotlessPlugin;
@@ -27,36 +26,31 @@ public class MadaStylePlugin implements Plugin<Project> {
     public void apply(Project project) {
         logger = project.getLogger();
         ext = project.getExtensions().create("mada", MadaStylePluginExtension.class);
-
         configExtractor = new ConfigFileExtractor(logger, project.getGradle().getGradleHomeDir().toPath());
 
-        ext.getNullcheckingEnabled().convention(true);
-
-        PluginContainer plugins = project.getPlugins();
-
-        plugins.withType(JavaPlugin.class, jp -> project.afterEvaluate(this::configure));
+        project.getPlugins().withType(JavaPlugin.class, jp -> project.afterEvaluate(this::configure));
     }
 
-    private void configure(Project p) {
-        if (Boolean.TRUE.equals(ext.getNullcheckingEnabled().get())) {
-            enableNullchecking(p);
-        }
+    /**
+     * Configuration of the project.
+     *
+     * Note that this is only called on java-projects, and only after project evaluation (so the DSL configuration has been
+     * evaluated).
+     *
+     * @param project the project
+     */
+    private void configure(Project project) {
         if (Boolean.TRUE.equals(ext.getFormatter().getEnabled().get())) {
-            enableFormatting(p);
+            project.getPlugins().withType(SpotlessPlugin.class, sp -> configureFormatter(project));
         }
     }
 
-    private void enableFormatting(Project p) {
-        p.getPlugins().withType(SpotlessPlugin.class, sp -> {
-            p.getExtensions().configure(SpotlessExtension.class, se -> {
-                logger.info("Configure spotless extension");
-                new SpotlessConfigurator(logger, configExtractor, ext.getFormatter()).configure(se);
-            });
+    private void configureFormatter(Project project) {
+        project.getExtensions().configure(SpotlessExtension.class, se -> {
+            logger.info("Configure spotless extension");
+            new SpotlessConfigurator(logger, configExtractor, ext.getFormatter()).configure(se);
         });
 
-        p.getPluginManager().apply("com.diffplug.spotless");
-    }
-
-    private void enableNullchecking(Project p) {
+        project.getPluginManager().apply("com.diffplug.spotless");
     }
 }
