@@ -9,6 +9,7 @@ import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.gradle.spotless.SpotlessPlugin;
 
 import dk.mada.style.config.ConfigFileExtractor;
+import dk.mada.style.config.PluginConfiguration;
 import dk.mada.style.format.SpotlessConfigurator;
 import dk.mada.style.nullcheck.ErrorProneConfigurator;
 import net.ltgt.gradle.errorprone.ErrorPronePlugin;
@@ -23,16 +24,38 @@ public class MadaStylePlugin implements Plugin<Project> {
     private MadaStylePluginExtension ext;
     /** Configuration file extractor. */
     private ConfigFileExtractor configExtractor;
+    /** Flag to activate formatter configuration. */
+    private boolean formatterActive;
+    /** Flag to activate null-check configuration. */
+    private boolean nullcheckerActive;
+    /** The plugin configurations. */
+    private PluginConfiguration configuration;
 
     @Override
     public void apply(Project project) {
         logger = project.getLogger();
         ext = project.getExtensions().create("mada", MadaStylePluginExtension.class);
+        configuration = new PluginConfiguration(project);
+
         configExtractor = new ConfigFileExtractor(logger, project.getGradle().getGradleHomeDir().toPath());
 
-        project.getPlugins().withType(JavaPlugin.class, jp -> project.afterEvaluate(this::configure));
+        project.getPlugins().withType(JavaPlugin.class, jp -> {
+            // plugins need to be activated early to behave correctly
+            applyPlugins(project);
+            // but they can only be configured after the extension DSL has been parsed
+            project.afterEvaluate(this::configurePlugins);
+        });
     }
 
+    private void applyPlugins(Project project) {
+        if (nullcheckerActive) {
+            project.getPluginManager().apply("net.ltgt.errorprone");
+        }
+        if (formatterActive) {
+            project.getPluginManager().apply("com.diffplug.spotless");
+        }
+    }
+    
     /**
      * Configuration of the project.
      *
@@ -41,28 +64,29 @@ public class MadaStylePlugin implements Plugin<Project> {
      *
      * @param project the project
      */
-    private void configure(Project project) {
-        if (Boolean.TRUE.equals(ext.getFormatter().getEnabled().get())) {
+    private void configurePlugins(Project project) {
+        if (formatterActive) {
             project.getPlugins().withType(SpotlessPlugin.class, sp -> lazyConfigureFormatter(project));
-
-            project.getPluginManager().apply("com.diffplug.spotless");
         }
 
-        if (Boolean.TRUE.equals(ext.getNullChecker().getEnabled().get())) {
+        if (nullcheckerActive) {
             project.getPlugins().withType(ErrorPronePlugin.class, ep -> {
                 logger.lifecycle("configure errorprone!");
                 new ErrorProneConfigurator(project, configExtractor, ext.getNullChecker()).configure();
             });
-
-            project.getPluginManager().apply("net.ltgt.errorprone");
         }
     }
 
+    /**
+     * Hook spotless configuration on activation of its extension.
+     * It only gets configured on task activation.
+     *
+     * @param project the project
+     */
     private void lazyConfigureFormatter(Project project) {
         project.getExtensions().configure(SpotlessExtension.class, se -> {
             logger.info("Configure spotless extension");
             new SpotlessConfigurator(logger, configExtractor, ext.getFormatter()).configure(se);
         });
-
     }
 }
