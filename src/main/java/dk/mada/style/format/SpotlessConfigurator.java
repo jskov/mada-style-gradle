@@ -26,7 +26,7 @@ public class SpotlessConfigurator {
      * Creates new instance.
      *
      * @param logger          the gradle logger
-     * @param formatterConfig          the plugin configuration
+     * @param formatterConfig the plugin configuration
      * @param configExtractor the configuration extractor
      */
     public SpotlessConfigurator(Logger logger, FormatterConfiguration formatterConfig, ConfigFileExtractor configExtractor) {
@@ -42,6 +42,8 @@ public class SpotlessConfigurator {
      * @param se the spotless extension
      */
     public void configure(SpotlessExtension se) {
+        logger.info("dk.mada.style configure spotless");
+
         se.java(this::configureJava);
     }
 

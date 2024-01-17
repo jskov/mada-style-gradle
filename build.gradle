@@ -1,7 +1,7 @@
 plugins {
     id 'com.gradle.plugin-publish' version '1.2.1'
     id 'eclipse'
-    id 'dk.mada.style' version '0.0.1'
+    id 'dk.mada.style' version '0.0.2'
 }
 
 group = 'dk.mada.style'
@@ -19,6 +19,8 @@ dependencies {
 
     // null-checker
     implementation "net.ltgt.gradle:gradle-errorprone-plugin:3.1.0"
+    
+    compileOnly    "org.jspecify:jspecify:0.3.0"
 }
 
 // Checksum each configuration file so it is easy for the plugin to reason about their state
