@@ -61,6 +61,39 @@ gradlePlugin {
     }
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "dist"
+            url "file://${project.rootProject.file("build/dist").getAbsolutePath()}"
+        }
+    }
+}
+
+project.afterEvaluate { p ->
+    tasks.withType(GenerateMavenPom).all {
+        getPom().url = 'https://github.com/jskov/mada-style-gradle'
+        getPom().developers {
+            developer {
+                id = 'jskov'
+                name = 'Jesper Skov'
+                email = 'jskov@mada.dk'
+            }
+        }
+        getPom().licenses {
+            license {
+                name = 'The Apache License, Version 2.0'
+                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+        }
+        getPom().scm {
+            connection = 'scm:git:git://github.com/jskov/mada-style-gradle.git'
+            developerConnection = 'scm:git:ssh://github.com:jskov/mada-style-gradle.git'
+            url = 'https://github.com/jskov/mada-style-gradle/'
+        }
+    }
+}
+
 tasks.eclipse.doLast { project.mkdir("build/pluginUnderTestMetadata") }
 
 String digest(File f) {
