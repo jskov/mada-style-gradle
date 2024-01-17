@@ -20,8 +20,6 @@ import net.ltgt.gradle.errorprone.ErrorPronePlugin;
 public class MadaStylePlugin implements Plugin<Project> {
     /** The Gradle logger. */
     private Logger logger;
-    /** The style extension. */
-    private MadaStylePluginExtension ext;
     /** Configuration file extractor. */
     private ConfigFileExtractor configExtractor;
     /** Flag to activate formatter configuration. */
@@ -34,7 +32,6 @@ public class MadaStylePlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         logger = project.getLogger();
-        ext = project.getExtensions().create("mada", MadaStylePluginExtension.class);
         configuration = new PluginConfiguration(project);
 
         configExtractor = new ConfigFileExtractor(logger, project.getGradle().getGradleHomeDir().toPath());
@@ -72,7 +69,7 @@ public class MadaStylePlugin implements Plugin<Project> {
         if (nullcheckerActive) {
             project.getPlugins().withType(ErrorPronePlugin.class, ep -> {
                 logger.lifecycle("configure errorprone!");
-                new ErrorProneConfigurator(project, configExtractor, ext.getNullChecker()).configure();
+                new ErrorProneConfigurator(project, configuration.nullchecker()).configure();
             });
         }
     }
@@ -86,7 +83,7 @@ public class MadaStylePlugin implements Plugin<Project> {
     private void lazyConfigureFormatter(Project project) {
         project.getExtensions().configure(SpotlessExtension.class, se -> {
             logger.info("Configure spotless extension");
-            new SpotlessConfigurator(logger, configExtractor, ext.getFormatter()).configure(se);
+            new SpotlessConfigurator(logger, configuration.formatter(), configExtractor).configure(se);
         });
     }
 }

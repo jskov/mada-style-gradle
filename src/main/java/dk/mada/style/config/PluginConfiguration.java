@@ -16,48 +16,60 @@ public class PluginConfiguration {
 
     private final FormatterConfiguration formatterConf;
     private final NullcheckerConfiguration nullcheckerProps;
-    
-    public PluginConfiguration(Project project) {
-        this.project = project;
-        
-        formatterConf = new FormatterConfiguration(
-                getBoolProperty("formatter.enabled", true)
-                );
-
-        nullcheckerProps = new NullcheckerConfiguration(
-                getBoolProperty("nullchecker.enabled", true)
-                );
-}
-
-    public FormatterConfiguration formatter() {
-        return formatterConf;
-    }
-
-    public NullcheckerConfiguration nullchecker() {
-        return nullcheckerProps;
-    }
 
     /**
      * @param enabled  flag to activate formatter
      */
-    public record FormatterConfiguration(boolean enabled) {
+    public record FormatterConfiguration(boolean enabled, String include, String exclude, String eclipseConfigPath) {
     }
     
     /**
      * @param enabled  flag to activate null-checker
      */
-    public record NullcheckerConfiguration(boolean enabled) {
+    public record NullcheckerConfiguration(boolean enabled, String packages, String excludePathsRegexp) {
     }
-    
-    public boolean getBoolProperty(String name, boolean defaultValue) {
+
+    /**
+     * Creates a new instance.
+     *
+     * @param project the Gradle project
+     */
+    public PluginConfiguration(Project project) {
+        this.project = project;
+        
+        formatterConf = new FormatterConfiguration(
+                getBoolProperty("formatter.enabled", true),
+                getProperty("formatter.include", "src/main/java/**/*.java"),
+                getProperty("formatter.exclude", ""),
+                getProperty("formatter.eclipse-config-path", null)
+                );
+
+        nullcheckerProps = new NullcheckerConfiguration(
+                getBoolProperty("nullchecker.enabled", true),
+                getProperty("nullchecker.packages", "dk"),
+                getProperty("nullchecker.excluded-paths-regexp", null)
+                );
+    }
+
+    /** {@return the formatter configuration} */
+    public FormatterConfiguration formatter() {
+        return formatterConf;
+    }
+
+    /** {@return the null-checker configuration} */
+    public NullcheckerConfiguration nullchecker() {
+        return nullcheckerProps;
+    }
+
+    private boolean getBoolProperty(String name, boolean defaultValue) {
         String value = getProperty(name, null);
         if (value == null) {
             return defaultValue;
         }
         return Boolean.valueOf(value);
     }
-    
-    public String getProperty(String name, String defaultValue) {
+
+    private String getProperty(String name, String defaultValue) {
         Object value = project.findProperty(DK_MADA_STYLE_PROPPREFIX + name);
         if (value == null) {
             value = defaultValue;

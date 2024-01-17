@@ -9,7 +9,7 @@ import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
 
-import dk.mada.style.config.ConfigFileExtractor;
+import dk.mada.style.config.PluginConfiguration.NullcheckerConfiguration;
 import net.ltgt.gradle.errorprone.CheckSeverity;
 import net.ltgt.gradle.errorprone.ErrorProneOptions;
 
@@ -22,21 +22,18 @@ public class ErrorProneConfigurator {
     /** The gradle logger. */
     private final Logger logger;
     /** The null-checker configuration. */
-    private final NullcheckerConfig nullcheckerConfig;
-    /** The default configuration file, shipped with this plugin. */
-//    private final Path defaultConfigFile;
+    private final NullcheckerConfiguration nullcheckerConfig;
 
     /**
      * Creates new instance.
      *
      * @param project          the gradle project
-     * @param configExtractor the configuration extractor
-     * @param nullcheckerConfig the formatter configuration
+     * @param nullcheckerConfiguration the null-checker configuration
      */
-    public ErrorProneConfigurator(Project project, ConfigFileExtractor configExtractor, NullcheckerConfig nullcheckerConfig) {
+    public ErrorProneConfigurator(Project project, NullcheckerConfiguration nullcheckerConfiguration) {
         this.project = project;
         this.logger = project.getLogger();
-        this.nullcheckerConfig = nullcheckerConfig;
+        this.nullcheckerConfig = nullcheckerConfiguration;
     }
 
     /**
@@ -57,8 +54,8 @@ public class ErrorProneConfigurator {
 
                 er.getDisableWarningsInGeneratedCode().set(false);
                 er.check("NullAway", CheckSeverity.ERROR);
-                er.option("NullAway:AnnotatedPackages", makeValidNoSpaceString(nullcheckerConfig.getPackages().get()));
-                er.getExcludedPaths().set(nullcheckerConfig.getExcludedPathsRegexp().getOrNull());
+                er.option("NullAway:AnnotatedPackages", makeValidNoSpaceString(nullcheckerConfig.packages()));
+                er.getExcludedPaths().set(nullcheckerConfig.excludePathsRegexp());
 
                 //  https://github.com/google/error-prone/issues/1542 (Set.of)
                 //  ? records
@@ -67,16 +64,6 @@ public class ErrorProneConfigurator {
                 er.check("JavaTimeDefaultTimeZone", CheckSeverity.OFF);
             }
         });
-        
-        
-//                excludedPaths = readProps().getProperty("excludedPaths")
-//
-//                if (!name.toLowerCase().contains("test")) {
-//                    check("NullAway", CheckSeverity.ERROR)
-//                    option("NullAway:AnnotatedPackages", "dk.mada")
-//                }
-//            }
-
     }
     
     private static String makeValidNoSpaceString(String s) {

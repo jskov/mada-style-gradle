@@ -1,14 +1,15 @@
 package dk.mada.style.format;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import org.gradle.api.file.RegularFile;
 import org.gradle.api.logging.Logger;
 
 import com.diffplug.gradle.spotless.JavaExtension;
 import com.diffplug.gradle.spotless.SpotlessExtension;
 
 import dk.mada.style.config.ConfigFileExtractor;
+import dk.mada.style.config.PluginConfiguration.FormatterConfiguration;
 
 /**
  * Configures Spotless with formatter preferences.
@@ -17,7 +18,7 @@ public class SpotlessConfigurator {
     /** The gradle logger. */
     private final Logger logger;
     /** The formatter configuration. */
-    private final FormatterConfig formatterConfig;
+    private final FormatterConfiguration formatterConfig;
     /** The default configuration file, shipped with this plugin. */
     private final Path defaultConfigFile;
 
@@ -25,10 +26,10 @@ public class SpotlessConfigurator {
      * Creates new instance.
      *
      * @param logger          the gradle logger
+     * @param formatterConfig          the plugin configuration
      * @param configExtractor the configuration extractor
-     * @param formatterConfig the formatter configuration
      */
-    public SpotlessConfigurator(Logger logger, ConfigFileExtractor configExtractor, FormatterConfig formatterConfig) {
+    public SpotlessConfigurator(Logger logger, FormatterConfiguration formatterConfig, ConfigFileExtractor configExtractor) {
         this.logger = logger;
         this.formatterConfig = formatterConfig;
 
@@ -45,8 +46,8 @@ public class SpotlessConfigurator {
     }
 
     private void configureJava(JavaExtension je) {
-        String include = formatterConfig.getInclude().get();
-        String exclude = formatterConfig.getExclude().get();
+        String include = formatterConfig.include();
+        String exclude = formatterConfig.exclude();
         Path configFile = getActiveConfigfile();
         logger.info("Spotless java config: {}", configFile);
         logger.info("Spotless java include:{} exclude:{}", include, exclude);
@@ -59,13 +60,11 @@ public class SpotlessConfigurator {
     }
 
     private Path getActiveConfigfile() {
-        Path useConfig;
-        RegularFile eclipseConfig = formatterConfig.getEclipseConfig().getOrNull();
-        if (eclipseConfig == null) {
-            useConfig = defaultConfigFile;
+        String configPath = formatterConfig.eclipseConfigPath();
+        if (configPath != null) {
+            return Paths.get(configPath);
         } else {
-            useConfig = eclipseConfig.getAsFile().toPath();
+            return defaultConfigFile;
         }
-        return useConfig;
     }
 }
