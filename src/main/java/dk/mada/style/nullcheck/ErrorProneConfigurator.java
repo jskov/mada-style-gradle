@@ -57,10 +57,9 @@ public class ErrorProneConfigurator {
                 er.option("NullAway:AnnotatedPackages", makeValidNoSpaceString(nullcheckerConfig.packages()));
                 er.getExcludedPaths().set(nullcheckerConfig.excludePathsRegexp());
 
-                //  https://github.com/google/error-prone/issues/1542 (Set.of)
-                //  ? records
+                //  https://github.com/google/error-prone/issues/1542 (Set.of - possible records problem)
                 er.check("ImmutableEnumChecker", CheckSeverity.OFF);
-                // Timezone is not relevant
+                // The time zone not relevant
                 er.check("JavaTimeDefaultTimeZone", CheckSeverity.OFF);
             }
         });
