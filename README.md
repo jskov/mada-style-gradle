@@ -8,7 +8,22 @@ This plugin can be removed without risking anything more than the style shifting
 
 ## Activated plugins
 
+**Formatter**
 * [Spotless](https://plugins.gradle.org/plugin/com.diffplug.spotless): Enforces the eclipse-base dk.mada code formatter
+
+**Null-checker**
+* [ErrorProne](https://plugins.gradle.org/plugin/net.ltgt.errorprone): Error checking framework using [NullAway](https://github.com/uber/NullAway)
+
+## Configuration
+
+Properties in gradle.properties allows some configuration of the plugin.
+This allows the plugin to be removed without breaking the build.
+
+The options are (shows here with their default value):
+
+* dk.mada.style.formatter.enabled = true  
+Boolean flag allowing the formatter to be disabled
+
 
 
 ## Development
