@@ -51,9 +51,19 @@ public class PluginConfiguration {
                 );
     }
 
+    /** {@return true if the formatter is active} */
+    public boolean isFormatterActive() {
+        return formatter().enabled();
+    }
+    
     /** {@return the formatter configuration} */
     public FormatterConfiguration formatter() {
         return formatterConf;
+    }
+
+    /** {@return true if the null-checker is active} */
+    public boolean isNullcheckerActive() {
+        return nullchecker().enabled();
     }
 
     /** {@return the null-checker configuration} */

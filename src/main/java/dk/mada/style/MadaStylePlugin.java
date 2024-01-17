@@ -22,10 +22,6 @@ public class MadaStylePlugin implements Plugin<Project> {
     private Logger logger;
     /** Configuration file extractor. */
     private ConfigFileExtractor configExtractor;
-    /** Flag to activate formatter configuration. */
-    private boolean formatterActive;
-    /** Flag to activate null-check configuration. */
-    private boolean nullcheckerActive;
     /** The plugin configurations. */
     private PluginConfiguration configuration;
 
@@ -45,11 +41,11 @@ public class MadaStylePlugin implements Plugin<Project> {
     }
 
     private void applyPlugins(Project project) {
-        if (nullcheckerActive) {
-            project.getPluginManager().apply("net.ltgt.errorprone");
-        }
-        if (formatterActive) {
+        if (configuration.isFormatterActive()) {
             project.getPluginManager().apply("com.diffplug.spotless");
+        }
+        if (configuration.isNullcheckerActive()) {
+            project.getPluginManager().apply("net.ltgt.errorprone");
         }
     }
     
@@ -62,11 +58,11 @@ public class MadaStylePlugin implements Plugin<Project> {
      * @param project the project
      */
     private void configurePlugins(Project project) {
-        if (formatterActive) {
+        if (configuration.isFormatterActive()) {
             project.getPlugins().withType(SpotlessPlugin.class, sp -> lazyConfigureFormatter(project));
         }
 
-        if (nullcheckerActive) {
+        if (configuration.isNullcheckerActive()) {
             project.getPlugins().withType(ErrorPronePlugin.class, ep -> {
                 logger.lifecycle("configure errorprone!");
                 new ErrorProneConfigurator(project, configuration.nullchecker()).configure();
