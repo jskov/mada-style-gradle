@@ -49,7 +49,6 @@ public class MadaStylePlugin implements Plugin<Project> {
         var configExtractor = new ConfigFileExtractor(project.getLogger(), project.getGradle().getGradleHomeDir().toPath());
 
         project.getExtensions().configure(SpotlessExtension.class, se -> {
-            project.getLogger().info("Configure spotless extension");
             new SpotlessConfigurator(project.getLogger(), configuration.formatter(), configExtractor).configure(se);
         });
     }

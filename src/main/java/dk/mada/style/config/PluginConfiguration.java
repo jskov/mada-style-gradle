@@ -32,7 +32,8 @@ public class PluginConfiguration {
      *
      * @param enabled flag to activate null-checker
      */
-    public record NullcheckerConfiguration(boolean enabled, String packages, String excludePathsRegexp) {
+    public record NullcheckerConfiguration(boolean enabled, boolean includeTestSource, String includePackages, String excludePackages,
+            String excludePathsRegexp) {
     }
 
     /**
@@ -50,9 +51,11 @@ public class PluginConfiguration {
                 getNullableProperty("formatter.eclipse-config-path", null));
 
         nullcheckerProps = new NullcheckerConfiguration(
-                getBoolProperty("nullchecker.enabled", true),
-                getProperty("nullchecker.packages", "dk"),
-                getProperty("nullchecker.excluded-paths-regexp", ""));
+                getBoolProperty("null-checker.enabled", true),
+                getBoolProperty("null-checker.include-test-source", false),
+                getProperty("null-checker.include-packages", "dk"),
+                getProperty("null-checker.exclude-packages", ""),
+                getProperty("null-checker.excluded-paths-regexp", ""));
     }
 
     /** {@return true if the formatter is active} */

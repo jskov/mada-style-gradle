@@ -37,7 +37,7 @@ public final class ConfigFileExtractor {
         this.logger = logger;
         this.gradleHomeDir = gradleHomeDir;
 
-        this.dataChecksums = readDatafileChecksums();
+        this.dataChecksums = ResourceConfigProperties.readConfigProperties(CHECKSUMS_PROPERTIES);
     }
 
     /**
@@ -79,19 +79,6 @@ public final class ConfigFileExtractor {
             return targetFile;
         } catch (IOException e) {
             throw new IllegalStateException("Failed to copy config file " + path + " to " + madaConfigDir, e);
-        }
-    }
-
-    private static Properties readDatafileChecksums() {
-        try (InputStream is = ConfigFileExtractor.class.getResourceAsStream(CHECKSUMS_PROPERTIES)) {
-            if (is == null) {
-                throw new IllegalStateException("Failed to find resource " + CHECKSUMS_PROPERTIES);
-            }
-            Properties p = new Properties();
-            p.load(is);
-            return p;
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to read properties from resource " + CHECKSUMS_PROPERTIES, e);
         }
     }
 }

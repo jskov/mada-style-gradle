@@ -51,8 +51,8 @@ public class SpotlessConfigurator {
         String include = formatterConfig.include();
         String exclude = formatterConfig.exclude();
         Path configFile = getActiveConfigfile();
-        logger.info("Spotless java config: {}", configFile);
-        logger.info("Spotless java include:{} exclude:{}", include, exclude);
+        logger.debug("Spotless java config: {}", configFile);
+        logger.debug("Spotless java include:{} exclude:{}", include, exclude);
 
         je.target(include);
         je.targetExclude(exclude);
