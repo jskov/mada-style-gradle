@@ -15,6 +15,16 @@ Add plugin activation to the build file header (substitute the relevant version)
         id 'dk.mada.style' version '1.n.n'
     }
 
+And make sure the plugin can be fetched from MavenCentral:
+
+    pluginManagement {
+        repositories {
+            gradlePluginPortal()
+            mavenCentral()
+        }
+    }
+
+
 For null-checker annotations, you should add the [JSpecify](https://jspecify.dev/) dependency:
 
     compileOnly    "org.jspecify:jspecify:0.3.0"
