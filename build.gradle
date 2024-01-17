@@ -4,6 +4,11 @@ plugins {
 //    id 'dk.mada.style' version '0.0.4'
 }
 
+ext {
+    mavenDisplayName = 'Plugin for enforcing java dk.mada coding style'
+    mavenDescription = 'A plugin that sets up null-checking and code formatting style for dk.mada development.'
+}
+
 group = 'dk.mada.style'
 
 repositories {
@@ -53,8 +58,8 @@ gradlePlugin {
     plugins {
         stylePlugin {
             id = 'dk.mada.style'
-            displayName = 'Plugin for enforcing java dk.mada coding style'
-            description = 'A plugin that sets up null-checking and code formatting style for dk.mada development.'
+            displayName = mavenDisplayName
+            description = mavenDescription
             tags.set(['error-prone', 'nullaway', 'checkstyle', 'spotless', 'style'])
             implementationClass = 'dk.mada.style.MadaStylePlugin'
         }
@@ -73,6 +78,9 @@ publishing {
 project.afterEvaluate { p ->
     tasks.withType(GenerateMavenPom).all {
         getPom().url = 'https://github.com/jskov/mada-style-gradle'
+        getPom().name = mavenDisplayName
+        getPom().description = mavenDescription
+
         getPom().developers {
             developer {
                 id = 'jskov'
