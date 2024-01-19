@@ -1,5 +1,6 @@
 package dk.mada.style.nullcheck;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
@@ -13,6 +14,7 @@ import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 import dk.mada.style.config.ResourceConfigProperties;
+import dk.mada.style.config.PluginConfiguration.ErrorProneConfiguration;
 import dk.mada.style.config.PluginConfiguration.NullcheckerConfiguration;
 import net.ltgt.gradle.errorprone.CheckSeverity;
 import net.ltgt.gradle.errorprone.ErrorProneOptions;
@@ -26,6 +28,8 @@ public class ErrorProneConfigurator {
     private final Project project;
     /** The gradle logger. */
     private final Logger logger;
+    /** The ErrorProne configuration. */
+    private final ErrorProneConfiguration errorProneConfig;
     /** The null-checker configuration. */
     private final NullcheckerConfiguration nullcheckerConfig;
 
@@ -33,12 +37,14 @@ public class ErrorProneConfigurator {
      * Creates new instance.
      *
      * @param project                  the gradle project
-     * @param nullcheckerConfiguration the null-checker configuration
+     * @param errorProneConfig the ErrorProne configuration
+     * @param nullcheckerConfig the null-checker configuration
      */
-    public ErrorProneConfigurator(Project project, NullcheckerConfiguration nullcheckerConfiguration) {
+    public ErrorProneConfigurator(Project project, ErrorProneConfiguration errorProneConfig, NullcheckerConfiguration nullcheckerConfig) {
         this.project = project;
         this.logger = project.getLogger();
-        this.nullcheckerConfig = nullcheckerConfiguration;
+        this.errorProneConfig = errorProneConfig;
+        this.nullcheckerConfig = nullcheckerConfig;
     }
 
     /**
@@ -48,28 +54,30 @@ public class ErrorProneConfigurator {
         logger.info("dk.mada.style configure errorprone");
 
         Properties depVersions = ResourceConfigProperties.readConfigProperties(CONFIG_DATAFILE_DEPENDENCIES_PROPERTIES);
-        project.getDependencies().add("annotationProcessor", addVersion(depVersions, "com.uber.nullaway:nullaway"));
         project.getDependencies().add("errorprone", addVersion(depVersions, "com.google.errorprone:error_prone_core"));
 
+        if (nullcheckerConfig.enabled()) {
+            project.getDependencies().add("annotationProcessor", addVersion(depVersions, "com.uber.nullaway:nullaway"));
+        }
+
         project.getTasks().withType(JavaCompile.class, jc -> {
+            boolean isTestCodeCompileTask = jc.getName().toLowerCase(Locale.ROOT).contains("test");
+            if (isTestCodeCompileTask && errorProneConfig.ignoreTestSource()) {
+                return;
+            }
+
             CompileOptions opts = jc.getOptions();
             // This trick only found by looking at ErrorProne plugin code (hidden by Groovy/Gradle API)
             ErrorProneOptions er = ((ExtensionAware) opts).getExtensions().getByType(ErrorProneOptions.class);
 
-            boolean isMainCodeCompileTask = !jc.getName().toLowerCase(Locale.ROOT).contains("test");
-            if (isMainCodeCompileTask || nullcheckerConfig.includeTestSource()) {
-                logger.info(" enable null-check for task {}", jc.getName());
+            makeList(errorProneConfig.disabledRules()).forEach(ruleName -> er.check(ruleName, CheckSeverity.OFF));
+            er.getExcludedPaths().set(errorProneConfig.excludePathsRegexp());
+            er.getDisableWarningsInGeneratedCode().set(errorProneConfig.ignoreGeneratedSource());
 
-                er.getDisableWarningsInGeneratedCode().set(false);
+            if (nullcheckerConfig.enabled()) {
                 er.check("NullAway", CheckSeverity.ERROR);
                 er.option("NullAway:AnnotatedPackages", makeValidNoSpaceString(nullcheckerConfig.includePackages()));
                 er.option("NullAway:UnannotatedSubPackages", makeValidNoSpaceString(nullcheckerConfig.excludePackages()));
-                er.getExcludedPaths().set(nullcheckerConfig.excludePathsRegexp());
-
-                // https://github.com/google/error-prone/issues/1542 (Set.of - possible records problem)
-                er.check("ImmutableEnumChecker", CheckSeverity.OFF);
-                // The time zone not relevant
-                er.check("JavaTimeDefaultTimeZone", CheckSeverity.OFF);
             }
         });
     }
@@ -83,5 +91,11 @@ public class ErrorProneConfigurator {
         return Stream.of(s.split(",", -1))
                 .map(String::trim)
                 .collect(Collectors.joining(","));
+    }
+    
+    private static List<String> makeList(String s) {
+        return Stream.of(s.split(",", -1))
+                .map(String::trim)
+                .toList();
     }
 }
