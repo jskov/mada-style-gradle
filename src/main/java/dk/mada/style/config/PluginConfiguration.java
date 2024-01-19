@@ -42,7 +42,8 @@ public class PluginConfiguration {
      *
      * @param enabled flag to activate error prone
      */
-    public record ErrorProneConfiguration(boolean enabled, boolean ignoreTestSource, boolean ignoreGeneratedSource, String excludePathsRegexp, String disabledRules) {
+    public record ErrorProneConfiguration(boolean enabled, boolean ignoreTestSource, boolean ignoreGeneratedSource,
+            String excludePathsRegexp, String disabledRules) {
     }
 
     /**
@@ -61,8 +62,8 @@ public class PluginConfiguration {
                 getProperty("errorprone.disabled-rules",
                         // https://github.com/google/error-prone/issues/1542 (Set.of - possible records problem)
                         "ImmutableEnumChecker,"
-                        // The time zone is not relevant
-                        + "JavaTimeDefaultTimeZone"));
+                                // The time zone is not relevant
+                                + "JavaTimeDefaultTimeZone"));
 
         formatterConf = new FormatterConfiguration(
                 getBoolProperty("formatter.enabled", true),

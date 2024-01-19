@@ -36,8 +36,8 @@ public class ErrorProneConfigurator {
     /**
      * Creates new instance.
      *
-     * @param project                  the gradle project
-     * @param errorProneConfig the ErrorProne configuration
+     * @param project           the gradle project
+     * @param errorProneConfig  the ErrorProne configuration
      * @param nullcheckerConfig the null-checker configuration
      */
     public ErrorProneConfigurator(Project project, ErrorProneConfiguration errorProneConfig, NullcheckerConfiguration nullcheckerConfig) {
@@ -92,7 +92,7 @@ public class ErrorProneConfigurator {
                 .map(String::trim)
                 .collect(Collectors.joining(","));
     }
-    
+
     private static List<String> makeList(String s) {
         return Stream.of(s.split(",", -1))
                 .map(String::trim)
