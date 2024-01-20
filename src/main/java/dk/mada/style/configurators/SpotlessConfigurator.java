@@ -1,4 +1,4 @@
-package dk.mada.style.format;
+package dk.mada.style.configurators;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,6 +15,8 @@ import dk.mada.style.config.PluginConfiguration.FormatterConfiguration;
  * Configures Spotless with formatter preferences.
  */
 public class SpotlessConfigurator {
+    /** The default configuration resource path. */
+    private static final String SPOTLESS_ECLIPSE_FORMATTER_MADA_XML = "spotless/eclipse-formatter-mada.xml";
     /** The gradle logger. */
     private final Logger logger;
     /** The formatter configuration. */
@@ -33,7 +35,7 @@ public class SpotlessConfigurator {
         this.logger = logger;
         this.formatterConfig = formatterConfig;
 
-        defaultConfigFile = configExtractor.getLocalConfigFile("spotless/eclipse-formatter-mada.xml");
+        defaultConfigFile = configExtractor.getLocalConfigFile(SPOTLESS_ECLIPSE_FORMATTER_MADA_XML);
     }
 
     /**

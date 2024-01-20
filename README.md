@@ -31,13 +31,9 @@ For null-checker annotations, you should add the [JSpecify](https://jspecify.dev
 
 ## Based on plugins
 
-**Error Prone**
+* [Checkstyle](https://docs.gradle.org/current/userguide/checkstyle_plugin.html): Style checking framework
 * [ErrorProne](https://plugins.gradle.org/plugin/net.ltgt.errorprone): Error checking framework
-
-**Formatter**
 * [Spotless](https://plugins.gradle.org/plugin/com.diffplug.spotless): Enforces the eclipse-base dk.mada code formatter
-
-**Null-checker**
 * [NullAway](https://github.com/uber/NullAway): ErrorProne plugin
 
 ## Configuration
@@ -46,6 +42,18 @@ Properties in gradle.properties allows configuration of the plugin.
 Using properties (instead of DSL) allows the plugin to be removed without breaking the build.
 
 The options are (shows here with their default value).
+
+**Checkstyle**
+
+By default uses [this configuration](./src/main/resources/config/checkstyle/checkstyle-mada.xml)
+
+* `dk.mada.style.checkstyle.enabled = true`  
+ Boolean flag allowing the checkstyle checker to be disabled
+* `dk.mada.style.checkstyle.ignore-test-source = false`  
+ Boolean flag to control scanning of test source
+* `dk.mada.style.checkstyle.config-path = null`  
+ Optional path to an alternative checkstyle configuration file
+
 
 **ErrorProne**
 
