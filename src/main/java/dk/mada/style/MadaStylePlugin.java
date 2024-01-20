@@ -19,7 +19,7 @@ import net.ltgt.gradle.errorprone.ErrorPronePlugin;
 /**
  * A plugin defining the style used for dk.mada java code.
  */
-public class MadaStylePlugin implements Plugin<Project> {
+public final class MadaStylePlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         project.getPlugins().withType(JavaPlugin.class, jp -> applyPlugins(project));

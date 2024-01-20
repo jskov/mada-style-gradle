@@ -23,6 +23,7 @@ import net.ltgt.gradle.errorprone.ErrorPronePlugin;
  * Configures Spotless with formatter preferences.
  */
 public class ErrorProneConfigurator {
+    /** The default configuration resource path. */
     private static final String CONFIG_DATAFILE_DEPENDENCIES_PROPERTIES = "/config/datafile-dependencies.properties";
     /** The gradle project. */
     private final Project project;
@@ -56,9 +57,9 @@ public class ErrorProneConfigurator {
     public void configure() {
         logger.info("dk.mada.style configure errorprone");
 
-        addDependency(project, "com.google.errorprone:error_prone_core");
+        addDependency("com.google.errorprone:error_prone_core");
         if (nullcheckerConfig.enabled()) {
-            addDependency(project, "com.uber.nullaway:nullaway");
+            addDependency("com.uber.nullaway:nullaway");
         }
 
         project.getTasks().withType(JavaCompile.class, jc -> {
@@ -86,7 +87,7 @@ public class ErrorProneConfigurator {
         }
     }
 
-    private void addDependency(Project project, String groupArtifact) {
+    private void addDependency(String groupArtifact) {
         String version = dependencyVersions.getProperty(groupArtifact);
         String gav = groupArtifact + ":" + Objects.requireNonNull(version, "Did not find version for dependency '" + groupArtifact + "'");
         project.getDependencies().add(ErrorPronePlugin.CONFIGURATION_NAME, gav);

@@ -14,6 +14,8 @@ import dk.mada.style.config.PluginConfiguration.CheckstyleConfiguration;
  * Configures Checkstyle with preferences.
  */
 public class CheckstyleConfigurator {
+    /** The default configuration resource path. */
+    private static final String CHECKSTYLE_CHECKSTYLE_MADA_XML = "checkstyle/checkstyle-mada.xml";
     /** The gradle project. */
     private final Project project;
     /** The gradle logger. */
@@ -35,7 +37,7 @@ public class CheckstyleConfigurator {
         this.checkstyleConfig = checkstyleConfig;
         this.logger = project.getLogger();
 
-        defaultConfigFile = configExtractor.getLocalConfigFile("checkstyle/checkstyle-mada.xml");
+        defaultConfigFile = configExtractor.getLocalConfigFile(CHECKSTYLE_CHECKSTYLE_MADA_XML);
     }
 
     /**
