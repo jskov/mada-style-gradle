@@ -9,8 +9,8 @@ import com.diffplug.gradle.spotless.SpotlessPlugin;
 
 import dk.mada.style.config.ConfigFileExtractor;
 import dk.mada.style.config.PluginConfiguration;
+import dk.mada.style.errorprone.ErrorProneConfigurator;
 import dk.mada.style.format.SpotlessConfigurator;
-import dk.mada.style.nullcheck.ErrorProneConfigurator;
 import net.ltgt.gradle.errorprone.ErrorPronePlugin;
 
 /**
