@@ -1,4 +1,4 @@
-package dk.mada.style.checkstyle;
+package dk.mada.style.configurators;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

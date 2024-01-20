@@ -9,11 +9,11 @@ import org.gradle.api.plugins.quality.CheckstylePlugin;
 import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.gradle.spotless.SpotlessPlugin;
 
-import dk.mada.style.checkstyle.CheckstyleConfigurator;
 import dk.mada.style.config.ConfigFileExtractor;
 import dk.mada.style.config.PluginConfiguration;
-import dk.mada.style.errorprone.ErrorProneConfigurator;
-import dk.mada.style.format.SpotlessConfigurator;
+import dk.mada.style.configurators.CheckstyleConfigurator;
+import dk.mada.style.configurators.ErrorProneConfigurator;
+import dk.mada.style.configurators.SpotlessConfigurator;
 import net.ltgt.gradle.errorprone.ErrorPronePlugin;
 
 /**

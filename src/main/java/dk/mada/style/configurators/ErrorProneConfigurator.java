@@ -1,4 +1,4 @@
-package dk.mada.style.errorprone;
+package dk.mada.style.configurators;
 
 import java.util.List;
 import java.util.Locale;
