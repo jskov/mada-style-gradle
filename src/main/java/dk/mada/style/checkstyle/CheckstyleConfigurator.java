@@ -11,7 +11,7 @@ import dk.mada.style.config.ConfigFileExtractor;
 import dk.mada.style.config.PluginConfiguration.CheckstyleConfiguration;
 
 /**
- * Configures Spotless with formatter preferences.
+ * Configures Checkstyle with preferences.
  */
 public class CheckstyleConfigurator {
     /** The gradle project. */
