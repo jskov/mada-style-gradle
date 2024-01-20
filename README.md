@@ -31,11 +31,11 @@ For null-checker annotations, you should add the [JSpecify](https://jspecify.dev
 
 ## Based on plugins
 
-**Formatter**
-* [Spotless](https://plugins.gradle.org/plugin/com.diffplug.spotless): Enforces the eclipse-base dk.mada code formatter
-
 **Error Prone**
 * [ErrorProne](https://plugins.gradle.org/plugin/net.ltgt.errorprone): Error checking framework
+
+**Formatter**
+* [Spotless](https://plugins.gradle.org/plugin/com.diffplug.spotless): Enforces the eclipse-base dk.mada code formatter
 
 **Null-checker**
 * [NullAway](https://github.com/uber/NullAway): ErrorProne plugin
@@ -59,6 +59,8 @@ The options are (shows here with their default value).
  Optional regular expression used to exclude files from scanning
 
 **Formatter**
+
+By default uses [this configuration](./src/main/resources/config/spotless/eclipse-formatter-mada.xml)
 
 * `dk.mada.style.formatter.enabled = true`  
  Boolean flag allowing the formatter to be disabled
