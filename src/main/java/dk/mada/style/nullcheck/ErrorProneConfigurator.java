@@ -10,12 +10,11 @@ import java.util.stream.Stream;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.ExtensionAware;
-import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
 
-import dk.mada.style.config.ResourceConfigProperties;
 import dk.mada.style.config.PluginConfiguration.ErrorProneConfiguration;
 import dk.mada.style.config.PluginConfiguration.NullcheckerConfiguration;
+import dk.mada.style.config.ResourceConfigProperties;
 import net.ltgt.gradle.errorprone.CheckSeverity;
 import net.ltgt.gradle.errorprone.ErrorProneOptions;
 
@@ -61,25 +60,28 @@ public class ErrorProneConfigurator {
         }
 
         project.getTasks().withType(JavaCompile.class, jc -> {
+            // This trick only found by looking at ErrorProne plugin code (hidden by Groovy/Gradle API)
+            ErrorProneOptions er = ((ExtensionAware) jc.getOptions()).getExtensions().getByType(ErrorProneOptions.class);
+
             boolean isTestCodeCompileTask = jc.getName().toLowerCase(Locale.ROOT).contains("test");
             if (isTestCodeCompileTask && errorProneConfig.ignoreTestSource()) {
-                return;
-            }
-
-            CompileOptions opts = jc.getOptions();
-            // This trick only found by looking at ErrorProne plugin code (hidden by Groovy/Gradle API)
-            ErrorProneOptions er = ((ExtensionAware) opts).getExtensions().getByType(ErrorProneOptions.class);
-
-            makeList(errorProneConfig.disabledRules()).forEach(ruleName -> er.check(ruleName, CheckSeverity.OFF));
-            er.getExcludedPaths().set(errorProneConfig.excludePathsRegexp());
-            er.getDisableWarningsInGeneratedCode().set(errorProneConfig.ignoreGeneratedSource());
-
-            if (nullcheckerConfig.enabled()) {
-                er.check("NullAway", CheckSeverity.ERROR);
-                er.option("NullAway:AnnotatedPackages", makeValidNoSpaceString(nullcheckerConfig.includePackages()));
-                er.option("NullAway:UnannotatedSubPackages", makeValidNoSpaceString(nullcheckerConfig.excludePackages()));
+                er.getEnabled().set(false);
+            } else {
+                configureErrorProne(er);
             }
         });
+    }
+
+    private void configureErrorProne(ErrorProneOptions er) {
+        makeList(errorProneConfig.disabledRules()).forEach(ruleName -> er.check(ruleName, CheckSeverity.OFF));
+        er.getExcludedPaths().set(errorProneConfig.excludePathsRegexp());
+        er.getDisableWarningsInGeneratedCode().set(errorProneConfig.ignoreGeneratedSource());
+
+        if (nullcheckerConfig.enabled()) {
+            er.check("NullAway", CheckSeverity.ERROR);
+            er.option("NullAway:AnnotatedPackages", makeValidNoSpaceString(nullcheckerConfig.includePackages()));
+            er.option("NullAway:UnannotatedSubPackages", makeValidNoSpaceString(nullcheckerConfig.excludePackages()));
+        }
     }
 
     private static String addVersion(Properties dependencyVersions, String groupArtifact) {
