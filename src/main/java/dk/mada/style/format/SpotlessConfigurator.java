@@ -56,9 +56,9 @@ public class SpotlessConfigurator {
 
         je.target(include);
         je.targetExclude(exclude);
-        je.formatAnnotations();
 
         je.eclipse().configFile(configFile);
+        je.formatAnnotations(); // Note that this *must* come after the java formatter configuration
     }
 
     private Path getActiveConfigfile() {

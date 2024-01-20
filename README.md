@@ -54,7 +54,8 @@ The options are (shows here with their default value).
 * `dk.mada.style.errorprone.ignore-test-source = false`  
  Boolean flag to control scanning of test source
 * `dk.mada.style.errorprone.ignore-generated-source = false`  
- Boolean flag to control scanning of generated source
+ Boolean flag to control scanning of generated source  
+ Note: works poorly with Immutable generated sources (as they cannot be referenced from the main sources when enabled)
 * `dk.mada.style.errorprone.excluded-paths-regexp = `  
  Optional regular expression used to exclude files from scanning
 
