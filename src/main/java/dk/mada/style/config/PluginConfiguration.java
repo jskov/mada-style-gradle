@@ -14,12 +14,22 @@ public class PluginConfiguration {
     private static final String DK_MADA_STYLE_PROPPREFIX = "dk.mada.style.";
     /** The Gradle project. */
     private final Project project;
+    /** The parsed CheckStyle configuration. */
+    private final CheckstyleConfiguration checkstyleConf;
     /** The parsed ErrorProne configuration. */
     private final ErrorProneConfiguration errorproneConf;
     /** The parsed formatter configuration. */
     private final FormatterConfiguration formatterConf;
     /** The parsed null-checker configuration. */
     private final NullcheckerConfiguration nullcheckerProps;
+
+    /**
+     * Checkstyle configuration.
+     *
+     * @param enabled flag to activate checkstyle
+     */
+    public record CheckstyleConfiguration(boolean enabled, boolean ignoreTestSource, @Nullable String configPath) {
+    }
 
     /**
      * Formatter configuration.
@@ -54,6 +64,11 @@ public class PluginConfiguration {
     public PluginConfiguration(Project project) {
         this.project = project;
 
+        checkstyleConf = new CheckstyleConfiguration(
+                getBoolProperty("checkstyle.enabled", true),
+                getBoolProperty("checkstyle.ignore-test-source", false),
+                getNullableProperty("checkstyle.config-path", null));
+
         errorproneConf = new ErrorProneConfiguration(
                 getBoolProperty("errorprone.enabled", true),
                 getBoolProperty("errorprone.ignore-test-source", false),
@@ -75,6 +90,16 @@ public class PluginConfiguration {
                 getBoolProperty("null-checker.enabled", true),
                 getProperty("null-checker.include-packages", "dk"),
                 getProperty("null-checker.exclude-packages", ""));
+    }
+
+    /** {@return the CheckStyle configuration} */
+    public CheckstyleConfiguration checkstyle() {
+        return checkstyleConf;
+    }
+
+    /** {@return true if the CheckStyle checker is active} */
+    public boolean isCheckstyleActive() {
+        return checkstyle().enabled();
     }
 
     /** {@return the ErrorProne configuration} */

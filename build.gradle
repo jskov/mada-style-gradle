@@ -41,7 +41,9 @@ processResources {
     // Checksum each configuration file so it is easy for the plugin to reason about their state
     filesMatching('config/datafile-checksums.properties') {
         def eclipseFormatterMadaChecksum = digest(file('src/main/resources/config/spotless/eclipse-formatter-mada.xml'))
-        filter { l -> l.replace('@ECLIPSE_FORMATTER_MADA@', eclipseFormatterMadaChecksum) }
+        def checkstyleMadaChecksum = digest(file('src/main/resources/config/checkstyle/checkstyle-mada.xml'))
+        filter { l -> l.replace('@ECLIPSE_FORMATTER_MADA@', eclipseFormatterMadaChecksum)
+                        .replace('@CHECKSTYLE_MADA@',  checkstyleMadaChecksum) }
     }
     // Provide the plugin with versions for the dependencies it adds to the client build
     filesMatching('config/datafile-dependencies.properties') {

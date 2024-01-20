@@ -3,10 +3,13 @@ package dk.mada.style;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.quality.CheckstyleExtension;
+import org.gradle.api.plugins.quality.CheckstylePlugin;
 
 import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.gradle.spotless.SpotlessPlugin;
 
+import dk.mada.style.checkstyle.CheckstyleConfigurator;
 import dk.mada.style.config.ConfigFileExtractor;
 import dk.mada.style.config.PluginConfiguration;
 import dk.mada.style.errorprone.ErrorProneConfigurator;
@@ -24,11 +27,18 @@ public class MadaStylePlugin implements Plugin<Project> {
 
     private void applyPlugins(Project project) {
         var configuration = new PluginConfiguration(project);
+        var configExtractor = new ConfigFileExtractor(project.getLogger(), project.getGradle().getGradleHomeDir().toPath());
+
+        if (configuration.isCheckstyleActive()) {
+            project.getPluginManager().apply("checkstyle");
+
+            project.getPlugins().withType(CheckstylePlugin.class, cp -> lazyConfigureCheckstyle(project, configuration, configExtractor));
+        }
 
         if (configuration.isFormatterActive()) {
             project.getPluginManager().apply("com.diffplug.spotless");
 
-            project.getPlugins().withType(SpotlessPlugin.class, sp -> lazyConfigureFormatter(project, configuration));
+            project.getPlugins().withType(SpotlessPlugin.class, sp -> lazyConfigureFormatter(project, configuration, configExtractor));
         }
 
         if (configuration.isNullcheckerActive() || configuration.isErrorProneActive()) {
@@ -40,16 +50,26 @@ public class MadaStylePlugin implements Plugin<Project> {
     }
 
     /**
+     * Hook checkstyle configuration on activation of its extension. It only gets configured on task activation.
+     *
+     * @param project         the project
+     * @param configuration   the plugin configuration
+     * @param configExtractor the configuration extractor
+     */
+    private void lazyConfigureCheckstyle(Project project, PluginConfiguration configuration, ConfigFileExtractor configExtractor) {
+        project.getExtensions().configure(CheckstyleExtension.class,
+                ce -> new CheckstyleConfigurator(project.getLogger(), configuration.checkstyle(), configExtractor).configure(ce));
+    }
+
+    /**
      * Hook spotless configuration on activation of its extension. It only gets configured on task activation.
      *
-     * @param project       the project
-     * @param configuration the plugin configuration
+     * @param project         the project
+     * @param configuration   the plugin configuration
+     * @param configExtractor the configuration extractor
      */
-    private void lazyConfigureFormatter(Project project, PluginConfiguration configuration) {
-        var configExtractor = new ConfigFileExtractor(project.getLogger(), project.getGradle().getGradleHomeDir().toPath());
-
-        project.getExtensions().configure(SpotlessExtension.class, se -> {
-            new SpotlessConfigurator(project.getLogger(), configuration.formatter(), configExtractor).configure(se);
-        });
+    private void lazyConfigureFormatter(Project project, PluginConfiguration configuration, ConfigFileExtractor configExtractor) {
+        project.getExtensions().configure(SpotlessExtension.class,
+                se -> new SpotlessConfigurator(project.getLogger(), configuration.formatter(), configExtractor).configure(se));
     }
 }
