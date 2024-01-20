@@ -7,7 +7,7 @@ import java.util.Properties;
 /**
  * Reads resource configuration properties.
  */
-public class ResourceConfigProperties {
+public final class ResourceConfigProperties {
     private ResourceConfigProperties() {
     }
 
