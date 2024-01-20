@@ -31,11 +31,14 @@ For null-checker annotations, you should add the [JSpecify](https://jspecify.dev
 
 ## Based on plugins
 
+**Error Prone**
+* [ErrorProne](https://plugins.gradle.org/plugin/net.ltgt.errorprone): Error checking framework
+
 **Formatter**
 * [Spotless](https://plugins.gradle.org/plugin/com.diffplug.spotless): Enforces the eclipse-base dk.mada code formatter
 
 **Null-checker**
-* [ErrorProne](https://plugins.gradle.org/plugin/net.ltgt.errorprone): Error checking framework using [NullAway](https://github.com/uber/NullAway)
+* [NullAway](https://github.com/uber/NullAway): ErrorProne plugin
 
 ## Configuration
 
@@ -44,7 +47,21 @@ Using properties (instead of DSL) allows the plugin to be removed without breaki
 
 The options are (shows here with their default value).
 
+**ErrorProne**
+
+* `dk.mada.style.errorprone.enabled = true`  
+ Boolean flag allowing the error prone checker to be disabled
+* `dk.mada.style.errorprone.ignore-test-source = false`  
+ Boolean flag to control scanning of test source
+* `dk.mada.style.errorprone.ignore-generated-source = false`  
+ Boolean flag to control scanning of generated source  
+ Note: works poorly with Immutable generated sources (as they cannot be referenced from the main sources when enabled)
+* `dk.mada.style.errorprone.excluded-paths-regexp = `  
+ Optional regular expression used to exclude files from scanning
+
 **Formatter**
+
+By default uses [this configuration](./src/main/resources/config/spotless/eclipse-formatter-mada.xml)
 
 * `dk.mada.style.formatter.enabled = true`  
  Boolean flag allowing the formatter to be disabled
@@ -57,16 +74,14 @@ The options are (shows here with their default value).
 
 **Null-checker**
 
+Note that this is a plugin to ErrorProne, so is also affected by errorprone configuration keys.
+
 * `dk.mada.style.null-checker.enabled = true`  
  Boolean flag allowing the null-checker to be disabled
-* `dk.mada.style.null-checker.include-test-source = false`  
- Boolean flag to control scanning of test source
 * `dk.mada.style.null-checker.include-packages = dk`  
  Comma-separated list of packages to be scanned (will include sub-packages)
 * `dk.mada.style.null-checker.exclude-packages = `  
  Comma-separated list of packages to be excluded from scanning
-* `dk.mada.style.null-checker.excluded-paths-regexp = `  
- Optional regular expression used to exclude from scanning
 
 ## Development
 

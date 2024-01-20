@@ -31,11 +31,11 @@ public class MadaStylePlugin implements Plugin<Project> {
             project.getPlugins().withType(SpotlessPlugin.class, sp -> lazyConfigureFormatter(project, configuration));
         }
 
-        if (configuration.isNullcheckerActive()) {
+        if (configuration.isNullcheckerActive() || configuration.isErrorProneActive()) {
             project.getPluginManager().apply("net.ltgt.errorprone");
 
             project.getPlugins().withType(ErrorPronePlugin.class,
-                    ep -> new ErrorProneConfigurator(project, configuration.nullchecker()).configure());
+                    ep -> new ErrorProneConfigurator(project, configuration.errorProne(), configuration.nullchecker()).configure());
         }
     }
 

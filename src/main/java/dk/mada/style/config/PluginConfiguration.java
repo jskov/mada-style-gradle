@@ -14,6 +14,8 @@ public class PluginConfiguration {
     private static final String DK_MADA_STYLE_PROPPREFIX = "dk.mada.style.";
     /** The Gradle project. */
     private final Project project;
+    /** The parsed ErrorProne configuration. */
+    private final ErrorProneConfiguration errorproneConf;
     /** The parsed formatter configuration. */
     private final FormatterConfiguration formatterConf;
     /** The parsed null-checker configuration. */
@@ -32,8 +34,16 @@ public class PluginConfiguration {
      *
      * @param enabled flag to activate null-checker
      */
-    public record NullcheckerConfiguration(boolean enabled, boolean includeTestSource, String includePackages, String excludePackages,
-            String excludePathsRegexp) {
+    public record NullcheckerConfiguration(boolean enabled, String includePackages, String excludePackages) {
+    }
+
+    /**
+     * ErrorProne configuration.
+     *
+     * @param enabled flag to activate error prone
+     */
+    public record ErrorProneConfiguration(boolean enabled, boolean ignoreTestSource, boolean ignoreGeneratedSource,
+            String excludePathsRegexp, String disabledRules) {
     }
 
     /**
@@ -44,6 +54,17 @@ public class PluginConfiguration {
     public PluginConfiguration(Project project) {
         this.project = project;
 
+        errorproneConf = new ErrorProneConfiguration(
+                getBoolProperty("errorprone.enabled", true),
+                getBoolProperty("errorprone.ignore-test-source", false),
+                getBoolProperty("errorprone.ignore-generated-source", false),
+                getProperty("errorprone.excluded-paths-regexp", ""),
+                getProperty("errorprone.disabled-rules", ""
+                        // https://github.com/google/error-prone/issues/1542 (Set.of - possible records problem)
+                        + "ImmutableEnumChecker,"
+                        // The time zone is not relevant
+                        + "JavaTimeDefaultTimeZone"));
+
         formatterConf = new FormatterConfiguration(
                 getBoolProperty("formatter.enabled", true),
                 getProperty("formatter.include", "src/main/java/**/*.java"),
@@ -52,10 +73,18 @@ public class PluginConfiguration {
 
         nullcheckerProps = new NullcheckerConfiguration(
                 getBoolProperty("null-checker.enabled", true),
-                getBoolProperty("null-checker.include-test-source", false),
                 getProperty("null-checker.include-packages", "dk"),
-                getProperty("null-checker.exclude-packages", ""),
-                getProperty("null-checker.excluded-paths-regexp", ""));
+                getProperty("null-checker.exclude-packages", ""));
+    }
+
+    /** {@return the ErrorProne configuration} */
+    public ErrorProneConfiguration errorProne() {
+        return errorproneConf;
+    }
+
+    /** {@return true if the ErrorProne checker is active} */
+    public boolean isErrorProneActive() {
+        return errorProne().enabled();
     }
 
     /** {@return true if the formatter is active} */
