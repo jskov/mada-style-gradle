@@ -59,11 +59,11 @@ public class PluginConfiguration {
                 getBoolProperty("errorprone.ignore-test-source", false),
                 getBoolProperty("errorprone.ignore-generated-source", false),
                 getProperty("errorprone.excluded-paths-regexp", ""),
-                getProperty("errorprone.disabled-rules",
+                getProperty("errorprone.disabled-rules", ""
                         // https://github.com/google/error-prone/issues/1542 (Set.of - possible records problem)
-                        "ImmutableEnumChecker,"
-                                // The time zone is not relevant
-                                + "JavaTimeDefaultTimeZone"));
+                        + "ImmutableEnumChecker,"
+                        // The time zone is not relevant
+                        + "JavaTimeDefaultTimeZone"));
 
         formatterConf = new FormatterConfiguration(
                 getBoolProperty("formatter.enabled", true),
