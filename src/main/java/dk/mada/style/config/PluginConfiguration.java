@@ -28,7 +28,8 @@ public class PluginConfiguration {
      *
      * @param enabled flag to activate checkstyle
      */
-    public record CheckstyleConfiguration(boolean enabled, boolean ignoreTestSource, @Nullable String configPath) {
+    public record CheckstyleConfiguration(boolean enabled, boolean ignoreFailures, boolean ignoreTestSource, @Nullable String toolVersion,
+            @Nullable String configPath) {
     }
 
     /**
@@ -66,8 +67,10 @@ public class PluginConfiguration {
 
         checkstyleConf = new CheckstyleConfiguration(
                 getBoolProperty("checkstyle.enabled", true),
+                getBoolProperty("checkstyle.ignore-failures", true),
                 getBoolProperty("checkstyle.ignore-test-source", false),
-                getNullableProperty("checkstyle.config-path", null));
+                getNullableProperty("checkstyle.config-path", null),
+                getNullableProperty("checkstyle.tool-version", null));
 
         errorproneConf = new ErrorProneConfiguration(
                 getBoolProperty("errorprone.enabled", true),

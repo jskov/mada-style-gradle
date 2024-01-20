@@ -58,7 +58,7 @@ public class MadaStylePlugin implements Plugin<Project> {
      */
     private void lazyConfigureCheckstyle(Project project, PluginConfiguration configuration, ConfigFileExtractor configExtractor) {
         project.getExtensions().configure(CheckstyleExtension.class,
-                ce -> new CheckstyleConfigurator(project.getLogger(), configuration.checkstyle(), configExtractor).configure(ce));
+                ce -> new CheckstyleConfigurator(project, configuration.checkstyle(), configExtractor).configure(ce));
     }
 
     /**

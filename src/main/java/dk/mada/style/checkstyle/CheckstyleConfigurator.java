@@ -3,6 +3,7 @@ package dk.mada.style.checkstyle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.quality.CheckstyleExtension;
 
@@ -13,6 +14,8 @@ import dk.mada.style.config.PluginConfiguration.CheckstyleConfiguration;
  * Configures Spotless with formatter preferences.
  */
 public class CheckstyleConfigurator {
+    /** The gradle project. */
+    private final Project project;
     /** The gradle logger. */
     private final Logger logger;
     /** The checkstyle configuration. */
@@ -23,13 +26,14 @@ public class CheckstyleConfigurator {
     /**
      * Creates new instance.
      *
-     * @param logger           the gradle logger
+     * @param project          the gradle project
      * @param checkstyleConfig the checkstyle configuration
      * @param configExtractor  the configuration extractor
      */
-    public CheckstyleConfigurator(Logger logger, CheckstyleConfiguration checkstyleConfig, ConfigFileExtractor configExtractor) {
-        this.logger = logger;
+    public CheckstyleConfigurator(Project project, CheckstyleConfiguration checkstyleConfig, ConfigFileExtractor configExtractor) {
+        this.project = project;
         this.checkstyleConfig = checkstyleConfig;
+        this.logger = project.getLogger();
 
         defaultConfigFile = configExtractor.getLocalConfigFile("checkstyle/checkstyle-mada.xml");
     }
@@ -40,8 +44,17 @@ public class CheckstyleConfigurator {
      * @param ce the checkstyle extension
      */
     public void configure(CheckstyleExtension ce) {
-        logger.lifecycle("dk.mada.style configure checkstype");
-        logger.lifecycle("Using {}", getActiveConfigfile());
+        logger.info("Checkstyle config {}", getActiveConfigfile());
+
+        ce.setIgnoreFailures(checkstyleConfig.ignoreFailures());
+        ce.setConfigFile(getActiveConfigfile().toFile());
+        String toolVersion = checkstyleConfig.toolVersion();
+        if (toolVersion != null) {
+            ce.setToolVersion(toolVersion);
+        }
+        if (checkstyleConfig.ignoreTestSource()) {
+            project.getTasks().named("checkstyleTest", t -> t.setOnlyIf("disabled by mada style", ta -> false));
+        }
     }
 
     private Path getActiveConfigfile() {
