@@ -17,6 +17,7 @@ import dk.mada.style.config.PluginConfiguration.NullcheckerConfiguration;
 import dk.mada.style.config.ResourceConfigProperties;
 import net.ltgt.gradle.errorprone.CheckSeverity;
 import net.ltgt.gradle.errorprone.ErrorProneOptions;
+import net.ltgt.gradle.errorprone.ErrorPronePlugin;
 
 /**
  * Configures Spotless with formatter preferences.
@@ -31,6 +32,8 @@ public class ErrorProneConfigurator {
     private final ErrorProneConfiguration errorProneConfig;
     /** The null-checker configuration. */
     private final NullcheckerConfiguration nullcheckerConfig;
+    /** The dependency versions used by this plugin. */
+    private final Properties dependencyVersions;
 
     /**
      * Creates new instance.
@@ -44,6 +47,7 @@ public class ErrorProneConfigurator {
         this.logger = project.getLogger();
         this.errorProneConfig = errorProneConfig;
         this.nullcheckerConfig = nullcheckerConfig;
+        this.dependencyVersions = ResourceConfigProperties.readConfigProperties(CONFIG_DATAFILE_DEPENDENCIES_PROPERTIES);
     }
 
     /**
@@ -52,11 +56,9 @@ public class ErrorProneConfigurator {
     public void configure() {
         logger.info("dk.mada.style configure errorprone");
 
-        Properties depVersions = ResourceConfigProperties.readConfigProperties(CONFIG_DATAFILE_DEPENDENCIES_PROPERTIES);
-        project.getDependencies().add("errorprone", addVersion(depVersions, "com.google.errorprone:error_prone_core"));
-
+        addDependency(project, "com.google.errorprone:error_prone_core");
         if (nullcheckerConfig.enabled()) {
-            project.getDependencies().add("annotationProcessor", addVersion(depVersions, "com.uber.nullaway:nullaway"));
+            addDependency(project, "com.uber.nullaway:nullaway");
         }
 
         project.getTasks().withType(JavaCompile.class, jc -> {
@@ -84,9 +86,10 @@ public class ErrorProneConfigurator {
         }
     }
 
-    private static String addVersion(Properties dependencyVersions, String groupArtifact) {
+    private void addDependency(Project project, String groupArtifact) {
         String version = dependencyVersions.getProperty(groupArtifact);
-        return groupArtifact + ":" + Objects.requireNonNull(version, "Did not find version for dependency '" + groupArtifact + "'");
+        String gav = groupArtifact + ":" + Objects.requireNonNull(version, "Did not find version for dependency '" + groupArtifact + "'");
+        project.getDependencies().add(ErrorPronePlugin.CONFIGURATION_NAME, gav);
     }
 
     private static String makeValidNoSpaceString(String s) {
