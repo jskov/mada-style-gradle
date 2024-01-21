@@ -33,8 +33,10 @@ For null-checker annotations, you should add the [JSpecify](https://jspecify.dev
 
 * [Checkstyle](https://docs.gradle.org/current/userguide/checkstyle_plugin.html): Style checking framework
 * [ErrorProne](https://plugins.gradle.org/plugin/net.ltgt.errorprone): Error checking framework
-* [Spotless](https://plugins.gradle.org/plugin/com.diffplug.spotless): Enforces the eclipse-base dk.mada code formatter
 * [NullAway](https://github.com/uber/NullAway): ErrorProne plugin
+* [Sonar](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-gradle/): SonarScanner
+* [Spotless](https://plugins.gradle.org/plugin/com.diffplug.spotless): Enforces the eclipse-base dk.mada code formatter
+
 
 ## Configuration
 
@@ -69,7 +71,7 @@ By default uses [this configuration](./src/main/resources/config/checkstyle/chec
 * `dk.mada.style.errorprone.excluded-paths-regexp = `  
  Optional regular expression used to exclude files from scanning
 
-**Formatter**
+**Formatter (Spotless)**
 
 By default uses [this configuration](./src/main/resources/config/spotless/eclipse-formatter-mada.xml)
 
@@ -92,6 +94,17 @@ Note that this is a plugin to ErrorProne, so is also affected by errorprone conf
  Comma-separated list of packages to be scanned (will include sub-packages)
 * `dk.mada.style.null-checker.exclude-packages = `  
  Comma-separated list of packages to be excluded from scanning
+
+**Sonar**
+
+All properties (except `enabled`) are simply passed on to the [Sonar plugin](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/analysis-parameters/), thus allowing configuration without DSL.
+
+** `dk.mada.style.sonar.enabled = true`  
+ Boolean flag allowing sonar to be disabled
+** `dk.mada.style.sonar.host.url = https://sonarcloud.io`  
+ The sonar cloud host address
+** `dk.mada.style.sonar.sourceEncoding = UTF-8`  
+ The source encoding
 
 ## Development
 
