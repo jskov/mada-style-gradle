@@ -49,8 +49,10 @@ By default uses [this configuration](./src/main/resources/config/checkstyle/chec
 
 * `dk.mada.style.checkstyle.enabled = true`  
  Boolean flag allowing the checkstyle checker to be disabled
+* `dk.mada.style.checkstyle.ignore-generated-source = false`  
+ Boolean flag to control scanning of test source files
 * `dk.mada.style.checkstyle.ignore-test-source = false`  
- Boolean flag to control scanning of test source
+ Boolean flag to control scanning of generated source files
 * `dk.mada.style.checkstyle.config-path = null`  
  Optional path to an alternative checkstyle configuration file
 
@@ -59,11 +61,11 @@ By default uses [this configuration](./src/main/resources/config/checkstyle/chec
 
 * `dk.mada.style.errorprone.enabled = true`  
  Boolean flag allowing the error prone checker to be disabled
-* `dk.mada.style.errorprone.ignore-test-source = false`  
- Boolean flag to control scanning of test source
 * `dk.mada.style.errorprone.ignore-generated-source = false`  
- Boolean flag to control scanning of generated source  
+ Boolean flag to control scanning of generated source files  
  Note: works poorly with Immutable generated sources (as they cannot be referenced from the main sources when enabled)
+* `dk.mada.style.errorprone.ignore-test-source = false`  
+ Boolean flag to control scanning of test source files
 * `dk.mada.style.errorprone.excluded-paths-regexp = `  
  Optional regular expression used to exclude files from scanning
 
