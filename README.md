@@ -1,10 +1,11 @@
 # mada-style-gradle
 
-A Gradle plugin that enables and configures plugins for java development as I prefer it (for dk.mada code).
+A Gradle plugin that enables and configures a number of code style and quality plugins for java development.
 
-If you are in disagreement about the style, you are most welcome to not use it.
+This plugin is a low-friction way of improving you code quality:
 
-This plugin can be removed without risking anything more than the style shifting away from my preferences.
+* enables a range of plugins with no clutter added to the build file (assuming the convention configurations are agreeable)
+* configured entirely via entries in `gradle.properties`, so disabling/removing the plugin does not break the build file
 
 ## Using the Plugin
 
@@ -24,12 +25,22 @@ And make sure the plugin can be fetched from MavenCentral:
         }
     }
 
+### Null-checking
 
 For null-checker annotations, you should add the [JSpecify](https://jspecify.dev/) dependency:
 
     compileOnly    "org.jspecify:jspecify:0.3.0"
 
-## Based on plugins
+Note that the annotations are not as easy to remove as the plugin (since they will be spread out over various source files).
+
+### Removing the Plugin
+
+Just remove the apply-line in `build.gradle` to disable or remove all plugin activity.
+
+Remove all the `dk.mada.style.`-prefixed entries in `gradle.properties` if you want to the remove the plugin for good.
+
+
+## Sub-plugins
 
 * [Checkstyle](https://docs.gradle.org/current/userguide/checkstyle_plugin.html): Style checking framework
 * [ErrorProne](https://plugins.gradle.org/plugin/net.ltgt.errorprone): Error checking framework
@@ -40,8 +51,10 @@ For null-checker annotations, you should add the [JSpecify](https://jspecify.dev
 
 ## Configuration
 
-Properties in gradle.properties allows configuration of the plugin.
-Using properties (instead of DSL) allows the plugin to be removed without breaking the build.
+Properties in `gradle.properties` allow configuration of the sub-plugins.
+
+Using properties (instead of DSL) allows the plugin (and sub-plugins) to be removed without breaking the build.
+(Assuming that you do not add sub-plugin DSL configuration elements to the build file.)
 
 The options are (shows here with their default value).
 
@@ -99,11 +112,11 @@ Note that this is a plugin to ErrorProne, so is also affected by errorprone conf
 
 All properties (except `enabled`) are simply passed on to the [Sonar plugin](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/analysis-parameters/), thus allowing configuration without DSL.
 
-** `dk.mada.style.sonar.enabled = true`  
+* `dk.mada.style.sonar.enabled = true`  
  Boolean flag allowing sonar to be disabled
-** `dk.mada.style.sonar.host.url = https://sonarcloud.io`  
+* `dk.mada.style.sonar.host.url = https://sonarcloud.io`  
  The sonar cloud host address
-** `dk.mada.style.sonar.sourceEncoding = UTF-8`  
+* `dk.mada.style.sonar.sourceEncoding = UTF-8`  
  The source encoding
 
 ## Development
@@ -111,11 +124,5 @@ All properties (except `enabled`) are simply passed on to the [Sonar plugin](htt
 For testing snapshot builds in other projects:
 
 ```console
-$ ./gradlew -t publishToMavenLocal
-```
-
-Got building a version used for self-check:
-
-```console
-$ ./gradlew -Pversion=0.0.1 publishToMavenLocal
+$ ./gradlew -t publishToMavenLocal -Pversion=0.0.1
 ```
