@@ -79,7 +79,8 @@ public class PluginConfiguration {
     /**
      * SonarSource sonar configuration.
      *
-     * @param enabled flag to activate sonar
+     * @param enabled                  flag to activate sonar
+     * @param madaConventionProperties convention properties for sonar
      */
     public record SonarConfiguration(boolean enabled, Map<String, String> madaConventionProperties) {
     }
