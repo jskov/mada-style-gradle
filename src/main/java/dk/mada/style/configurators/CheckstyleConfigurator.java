@@ -4,7 +4,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.plugins.quality.Checkstyle;
 import org.gradle.api.plugins.quality.CheckstyleExtension;
 
 import dk.mada.style.config.ConfigFileExtractor;
@@ -55,8 +57,20 @@ public class CheckstyleConfigurator {
             ce.setToolVersion(toolVersion);
         }
         if (checkstyleConfig.ignoreTestSource()) {
-            project.getTasks().named("checkstyleTest", t -> t.setOnlyIf("disabled by mada style", ta -> false));
+            project.getTasks().named("checkstyleTest", this::disableTask);
         }
+
+        if (checkstyleConfig.ignoreGeneratedSource()) {
+            project.getTasks().withType(Checkstyle.class, t -> {
+                if (t.getName().endsWith("Apt")) {
+                    disableTask(t);
+                }
+            });
+        }
+    }
+
+    private void disableTask(Task t) {
+        t.setOnlyIf("disabled by mada style", ta -> false);
     }
 
     private Path getActiveConfigfile() {

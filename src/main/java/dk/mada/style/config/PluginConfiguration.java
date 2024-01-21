@@ -26,13 +26,15 @@ public class PluginConfiguration {
     /**
      * Checkstyle configuration.
      *
-     * @param enabled          flag to activate checkstyle
-     * @param ignoreFailures   flag to ignore failures
-     * @param ignoreTestSource flag to ignore test sources
-     * @param toolVersion      an optional checkstyle version to use
-     * @param configPath       an optional path to a checkstyle configuration file
+     * @param enabled               flag to activate checkstyle
+     * @param ignoreFailures        flag to ignore failures
+     * @param ignoreTestSource      flag to ignore test source files
+     * @param ignoreGeneratedSource flag to ignore generated source files
+     * @param toolVersion           an optional checkstyle version to use
+     * @param configPath            an optional path to a checkstyle configuration file
      */
-    public record CheckstyleConfiguration(boolean enabled, boolean ignoreFailures, boolean ignoreTestSource, @Nullable String toolVersion,
+    public record CheckstyleConfiguration(boolean enabled, boolean ignoreFailures, boolean ignoreTestSource, boolean ignoreGeneratedSource,
+            @Nullable String toolVersion,
             @Nullable String configPath) {
     }
 
@@ -61,8 +63,8 @@ public class PluginConfiguration {
      * ErrorProne configuration.
      *
      * @param enabled               flag to activate error prone
-     * @param ignoreTestSource      flag to ignore test sources
-     * @param ignoreGeneratedSource flag to ignore generated sources
+     * @param ignoreTestSource      flag to ignore test source files
+     * @param ignoreGeneratedSource flag to ignore generated source files
      * @param excludePathsRegexp    a regular expression of source paths to ignore
      * @param disabledRules         a comma-separated list of rule names to disable
      */
@@ -82,6 +84,7 @@ public class PluginConfiguration {
                 getBoolProperty("checkstyle.enabled", true),
                 getBoolProperty("checkstyle.ignore-failures", true),
                 getBoolProperty("checkstyle.ignore-test-source", false),
+                getBoolProperty("checkstyle.ignore-generated-source", false),
                 getNullableProperty("checkstyle.config-path", null),
                 getNullableProperty("checkstyle.tool-version", null));
 
