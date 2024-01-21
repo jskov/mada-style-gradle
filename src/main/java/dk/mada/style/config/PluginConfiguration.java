@@ -1,5 +1,7 @@
 package dk.mada.style.config;
 
+import java.util.Map;
+
 import org.gradle.api.Project;
 import org.jspecify.annotations.Nullable;
 
@@ -21,7 +23,9 @@ public class PluginConfiguration {
     /** The parsed formatter configuration. */
     private final FormatterConfiguration formatterConf;
     /** The parsed null-checker configuration. */
-    private final NullcheckerConfiguration nullcheckerProps;
+    private final NullcheckerConfiguration nullcheckerConf;
+    /** The parsed sonar configuration. */
+    private final SonarConfiguration sonarConf;
 
     /**
      * Checkstyle configuration.
@@ -36,6 +40,19 @@ public class PluginConfiguration {
     public record CheckstyleConfiguration(boolean enabled, boolean ignoreFailures, boolean ignoreTestSource, boolean ignoreGeneratedSource,
             @Nullable String toolVersion,
             @Nullable String configPath) {
+    }
+
+    /**
+     * ErrorProne configuration.
+     *
+     * @param enabled               flag to activate error prone
+     * @param ignoreTestSource      flag to ignore test source files
+     * @param ignoreGeneratedSource flag to ignore generated source files
+     * @param excludePathsRegexp    a regular expression of source paths to ignore
+     * @param disabledRules         a comma-separated list of rule names to disable
+     */
+    public record ErrorProneConfiguration(boolean enabled, boolean ignoreTestSource, boolean ignoreGeneratedSource,
+            String excludePathsRegexp, String disabledRules) {
     }
 
     /**
@@ -60,16 +77,11 @@ public class PluginConfiguration {
     }
 
     /**
-     * ErrorProne configuration.
+     * SonarSource sonar configuration.
      *
-     * @param enabled               flag to activate error prone
-     * @param ignoreTestSource      flag to ignore test source files
-     * @param ignoreGeneratedSource flag to ignore generated source files
-     * @param excludePathsRegexp    a regular expression of source paths to ignore
-     * @param disabledRules         a comma-separated list of rule names to disable
+     * @param enabled flag to activate sonar
      */
-    public record ErrorProneConfiguration(boolean enabled, boolean ignoreTestSource, boolean ignoreGeneratedSource,
-            String excludePathsRegexp, String disabledRules) {
+    public record SonarConfiguration(boolean enabled, Map<String, String> madaConventionProperties) {
     }
 
     /**
@@ -105,10 +117,17 @@ public class PluginConfiguration {
                 getProperty("formatter.exclude", ""),
                 getNullableProperty("formatter.eclipse-config-path", null));
 
-        nullcheckerProps = new NullcheckerConfiguration(
+        nullcheckerConf = new NullcheckerConfiguration(
                 getBoolProperty("null-checker.enabled", true),
                 getProperty("null-checker.include-packages", "dk"),
                 getProperty("null-checker.exclude-packages", ""));
+
+        sonarConf = new SonarConfiguration(
+                getBoolProperty("sonar.enabled", true),
+                Map.of(
+                        "sonar.host.url", "https://sonarcloud.io",
+                        "sonar.inclusions", "**/src/main/**",
+                        "sonar.sourceEncoding", "UTF-8"));
     }
 
     /** {@return the CheckStyle configuration} */
@@ -131,14 +150,19 @@ public class PluginConfiguration {
         return errorProne().enabled();
     }
 
+    /** {@return the formatter configuration} */
+    public FormatterConfiguration formatter() {
+        return formatterConf;
+    }
+
     /** {@return true if the formatter is active} */
     public boolean isFormatterActive() {
         return formatter().enabled();
     }
 
-    /** {@return the formatter configuration} */
-    public FormatterConfiguration formatter() {
-        return formatterConf;
+    /** {@return the null-checker configuration} */
+    public NullcheckerConfiguration nullchecker() {
+        return nullcheckerConf;
     }
 
     /** {@return true if the null-checker is active} */
@@ -146,9 +170,14 @@ public class PluginConfiguration {
         return nullchecker().enabled();
     }
 
-    /** {@return the null-checker configuration} */
-    public NullcheckerConfiguration nullchecker() {
-        return nullcheckerProps;
+    /** {@return the sonar configuration} */
+    public SonarConfiguration sonar() {
+        return sonarConf;
+    }
+
+    /** {@return true if sonar is active} */
+    public boolean isSonarActive() {
+        return sonar().enabled();
     }
 
     private boolean getBoolProperty(String name, boolean defaultValue) {

@@ -2,9 +2,12 @@ package dk.mada.style;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.quality.CheckstyleExtension;
 import org.gradle.api.plugins.quality.CheckstylePlugin;
+import org.sonarqube.gradle.SonarExtension;
+import org.sonarqube.gradle.SonarQubePlugin;
 
 import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.gradle.spotless.SpotlessPlugin;
@@ -13,6 +16,7 @@ import dk.mada.style.config.ConfigFileExtractor;
 import dk.mada.style.config.PluginConfiguration;
 import dk.mada.style.configurators.CheckstyleConfigurator;
 import dk.mada.style.configurators.ErrorProneConfigurator;
+import dk.mada.style.configurators.SonarConfigurator;
 import dk.mada.style.configurators.SpotlessConfigurator;
 import net.ltgt.gradle.errorprone.ErrorPronePlugin;
 
@@ -26,8 +30,11 @@ public final class MadaStylePlugin implements Plugin<Project> {
     }
 
     private void applyPlugins(Project project) {
+        Logger logger = project.getLogger();
+        logger.info("Applying mada.style plugin");
+
         var configuration = new PluginConfiguration(project);
-        var configExtractor = new ConfigFileExtractor(project.getLogger(), project.getGradle().getGradleHomeDir().toPath());
+        var configExtractor = new ConfigFileExtractor(logger, project.getGradle().getGradleHomeDir().toPath());
 
         if (configuration.isCheckstyleActive()) {
             project.getPluginManager().apply("checkstyle");
@@ -46,6 +53,16 @@ public final class MadaStylePlugin implements Plugin<Project> {
 
             project.getPlugins().withType(ErrorPronePlugin.class,
                     ep -> new ErrorProneConfigurator(project, configuration.errorProne(), configuration.nullchecker()).configure());
+        }
+
+        if (configuration.isSonarActive()) {
+            // This should be a Gradle property, but is a system property
+            // https://sonarsource.atlassian.net/browse/SONARGRADL-134
+            System.setProperty("sonar.gradle.skipCompile", "true");
+
+            project.getPluginManager().apply("org.sonarqube");
+
+            project.getPlugins().withType(SonarQubePlugin.class, sp -> lazyConfigureSonar(project, configuration));
         }
     }
 
@@ -71,5 +88,16 @@ public final class MadaStylePlugin implements Plugin<Project> {
     private void lazyConfigureFormatter(Project project, PluginConfiguration configuration, ConfigFileExtractor configExtractor) {
         project.getExtensions().configure(SpotlessExtension.class,
                 se -> new SpotlessConfigurator(project.getLogger(), configuration.formatter(), configExtractor).configure(se));
+    }
+
+    /**
+     * Lazy configure sonar extension.
+     *
+     * @param project       the project
+     * @param configuration the plugin configuration
+     */
+    private void lazyConfigureSonar(Project project, PluginConfiguration configuration) {
+        project.getExtensions().configure(SonarExtension.class,
+                se -> new SonarConfigurator(project, configuration.sonar()).configure(se));
     }
 }
