@@ -29,6 +29,9 @@ dependencies {
     // null-checker
     implementation "net.ltgt.gradle:gradle-errorprone-plugin:3.1.0"
 
+    // sonar
+    implementation "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:4.4.1.3373"
+
     // dependencies added by the plugin
     // not used in the plugin code, but here Dependabot will keep them up to date
     addedDependencies "com.uber.nullaway:nullaway:0.10.21@jar"

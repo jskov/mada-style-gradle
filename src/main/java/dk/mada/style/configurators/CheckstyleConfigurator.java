@@ -8,6 +8,7 @@ import org.gradle.api.Task;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.quality.Checkstyle;
 import org.gradle.api.plugins.quality.CheckstyleExtension;
+import org.gradle.api.tasks.TaskContainer;
 
 import dk.mada.style.config.ConfigFileExtractor;
 import dk.mada.style.config.PluginConfiguration.CheckstyleConfiguration;
@@ -56,17 +57,16 @@ public class CheckstyleConfigurator {
         if (toolVersion != null) {
             ce.setToolVersion(toolVersion);
         }
+        TaskContainer taskContainer = project.getTasks();
         if (checkstyleConfig.ignoreTestSource()) {
-            project.getTasks().named("checkstyleTest", this::disableTask);
+            taskContainer.named("checkstyleTest", this::disableTask);
         }
 
-        if (checkstyleConfig.ignoreGeneratedSource()) {
-            project.getTasks().withType(Checkstyle.class, t -> {
-                if (t.getName().endsWith("Apt")) {
-                    disableTask(t);
-                }
-            });
-        }
+        taskContainer.withType(Checkstyle.class, t -> {
+            if (checkstyleConfig.ignoreGeneratedSource() && t.getName().endsWith("Apt")) {
+                disableTask(t);
+            }
+        });
     }
 
     private void disableTask(Task t) {
