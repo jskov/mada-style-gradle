@@ -53,7 +53,7 @@ public final class ConfigFileExtractor {
                 throw new IllegalStateException("Failed to read " + path + " from data checksums: " + dataChecksums);
             }
 
-            String suffix = "." + path.replaceAll(".*[.]", "");
+            String suffix = path.substring(path.lastIndexOf('.'));
             String filename = path.replace('/', ':').replace(suffix, "") + "-" + value + suffix;
 
             Path targetFile = madaConfigDir.resolve(filename);
