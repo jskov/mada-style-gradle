@@ -127,7 +127,6 @@ public class PluginConfiguration {
                 getBoolProperty("sonar.enabled", true),
                 Map.of(
                         "sonar.host.url", "https://sonarcloud.io",
-                        "sonar.inclusions", "**/src/main/**",
                         "sonar.sourceEncoding", "UTF-8"));
     }
 
