@@ -53,6 +53,7 @@ public class CheckstyleConfigurator {
 
         ce.setIgnoreFailures(checkstyleConfig.ignoreFailures());
         ce.setConfigFile(getActiveConfigfile().toFile());
+
         String toolVersion = checkstyleConfig.toolVersion();
         if (toolVersion != null) {
             ce.setToolVersion(toolVersion);
@@ -65,6 +66,9 @@ public class CheckstyleConfigurator {
         taskContainer.withType(Checkstyle.class, t -> {
             if (checkstyleConfig.ignoreGeneratedSource() && t.getName().endsWith("Apt")) {
                 disableTask(t);
+            } else {
+                t.setExcludes(checkstyleConfig.excludes());
+                t.setIncludes(checkstyleConfig.includes());
             }
         });
     }
