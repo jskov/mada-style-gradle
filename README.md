@@ -64,6 +64,10 @@ By default uses [this configuration](./src/main/resources/config/checkstyle/chec
 
 * `dk.mada.style.checkstyle.enabled = true`  
  Boolean flag allowing the checkstyle checker to be disabled
+* `dk.mada.style.checkstyle.includes = `  
+ Comma-separated Ant-style include patterns for files to check
+* `dk.mada.style.checkstyle.excludes = `  
+ Comma-separated Ant-style exclude patterns for files to not check
 * `dk.mada.style.checkstyle.ignore-generated-source = false`  
  Boolean flag to control scanning of test source files
 * `dk.mada.style.checkstyle.ignore-test-source = false`  

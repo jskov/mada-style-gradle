@@ -1,6 +1,8 @@
 package dk.mada.style.config;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.gradle.api.Project;
 import org.jspecify.annotations.Nullable;
@@ -31,13 +33,17 @@ public class PluginConfiguration {
      * Checkstyle configuration.
      *
      * @param enabled               flag to activate checkstyle
+     * @param includes              Ant-style pattern for sources to check
+     * @param excludes              Ant-style pattern for sources to ignore
      * @param ignoreFailures        flag to ignore failures
      * @param ignoreTestSource      flag to ignore test source files
      * @param ignoreGeneratedSource flag to ignore generated source files
      * @param toolVersion           an optional checkstyle version to use
      * @param configPath            an optional path to a checkstyle configuration file
      */
-    public record CheckstyleConfiguration(boolean enabled, boolean ignoreFailures, boolean ignoreTestSource, boolean ignoreGeneratedSource,
+    public record CheckstyleConfiguration(boolean enabled, List<String> includes, List<String> excludes, boolean ignoreFailures,
+            boolean ignoreTestSource,
+            boolean ignoreGeneratedSource,
             @Nullable String toolVersion,
             @Nullable String configPath) {
     }
@@ -95,6 +101,8 @@ public class PluginConfiguration {
 
         checkstyleConf = new CheckstyleConfiguration(
                 getBoolProperty("checkstyle.enabled", true),
+                getListProperty("checkstyle.includes", List.of()),
+                getListProperty("checkstyle.excludes", List.of()),
                 getBoolProperty("checkstyle.ignore-failures", true),
                 getBoolProperty("checkstyle.ignore-test-source", false),
                 getBoolProperty("checkstyle.ignore-generated-source", false),
@@ -206,4 +214,15 @@ public class PluginConfiguration {
         }
         return value.toString();
     }
+
+    private List<String> getListProperty(String name, List<String> defaultValue) {
+        String value = getNullableProperty(name, null);
+        if (value == null) {
+            return defaultValue;
+        }
+        return Stream.of(value.split(",", -1))
+                .map(String::trim)
+                .toList();
+    }
+
 }
