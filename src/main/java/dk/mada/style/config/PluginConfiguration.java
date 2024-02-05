@@ -106,8 +106,8 @@ public class PluginConfiguration {
                 getBoolProperty("checkstyle.ignore-failures", true),
                 getBoolProperty("checkstyle.ignore-test-source", false),
                 getBoolProperty("checkstyle.ignore-generated-source", false),
-                getNullableProperty("checkstyle.config-path", null),
-                getNullableProperty("checkstyle.tool-version", null));
+                getNullableProperty("checkstyle.tool-version", null),
+                getNullableProperty("checkstyle.config-path", null));
 
         errorproneConf = new ErrorProneConfiguration(
                 getBoolProperty("errorprone.enabled", true),
