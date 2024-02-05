@@ -1,7 +1,6 @@
 package dk.mada.style.configurators;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -27,6 +26,8 @@ public class CheckstyleConfigurator {
     private final CheckstyleConfiguration checkstyleConfig;
     /** The default configuration file, shipped with this plugin. */
     private final Path defaultConfigFile;
+    /** The default file extractor. */
+    private final ConfigFileExtractor configExtractor;
 
     /**
      * Creates new instance.
@@ -36,11 +37,12 @@ public class CheckstyleConfigurator {
      * @param configExtractor  the configuration extractor
      */
     public CheckstyleConfigurator(Project project, CheckstyleConfiguration checkstyleConfig, ConfigFileExtractor configExtractor) {
+        this.logger = project.getLogger();
         this.project = project;
         this.checkstyleConfig = checkstyleConfig;
-        this.logger = project.getLogger();
+        this.configExtractor = configExtractor;
 
-        defaultConfigFile = configExtractor.getLocalConfigFile(CHECKSTYLE_CHECKSTYLE_MADA_XML);
+        defaultConfigFile = configExtractor.getLocalConfigFileFromResource(CHECKSTYLE_CHECKSTYLE_MADA_XML);
     }
 
     /**
@@ -80,7 +82,7 @@ public class CheckstyleConfigurator {
     private Path getActiveConfigfile() {
         String configPath = checkstyleConfig.configPath();
         if (configPath != null) {
-            return Paths.get(configPath);
+            return configExtractor.getLocalFileFromConfigPath(configPath);
         } else {
             return defaultConfigFile;
         }

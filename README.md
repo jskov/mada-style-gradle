@@ -73,7 +73,8 @@ By default uses [this configuration](./src/main/resources/config/checkstyle/chec
 * `dk.mada.style.checkstyle.ignore-test-source = false`  
  Boolean flag to control scanning of generated source files
 * `dk.mada.style.checkstyle.config-path = null`  
- Optional path to an alternative checkstyle configuration file
+ Optional path to an alternative checkstyle configuration file  
+ This can be a URL; the content will be downloaded and cached (so if you want to update the content, you must change the URL)
 
 
 **ErrorProne**
@@ -100,6 +101,7 @@ By default uses [this configuration](./src/main/resources/config/spotless/eclips
  Ant-style exclude pattern for files to not format
 * `dk.mada.style.formatter.eclipse-config-path = null`  
  Optional path to an alternative eclipse formatter configuration file
+ This can be a URL; the content will be downloaded and cached (so if you want to update the content, you must change the URL)
 
 **Null-checker**
 
