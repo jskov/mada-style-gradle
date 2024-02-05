@@ -30,7 +30,7 @@ import org.gradle.api.logging.Logger;
  * This class can handle two input types:
  *
  * * classpath resources
- * 
+ *
  * The checksum used is computed by the build process, made available in the resource CHECKSUMS_PROPERTIES.
  *
  * * local path/url
@@ -72,7 +72,7 @@ public final class ConfigFileExtractor {
         String resourcePath = "/config/" + path;
         return lazyGetLocalFile(resourcePath, checksum, () -> readClassloaderResource(resourcePath));
     }
-    
+
     /**
      * Provides a local file from a configuration path.
      *
@@ -120,7 +120,7 @@ public final class ConfigFileExtractor {
             throw new IllegalStateException("Failed to save " + path + " in " + madaConfigDir, e);
         }
     }
-    
+
     private String readClassloaderResource(String resourcePath) {
         try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
             if (is == null) {

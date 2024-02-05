@@ -41,7 +41,7 @@ public class CheckstyleConfigurator {
         this.project = project;
         this.checkstyleConfig = checkstyleConfig;
         this.configExtractor = configExtractor;
-        
+
         defaultConfigFile = configExtractor.getLocalConfigFileFromResource(CHECKSTYLE_CHECKSTYLE_MADA_XML);
     }
 
