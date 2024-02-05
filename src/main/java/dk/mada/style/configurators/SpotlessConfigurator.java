@@ -35,7 +35,7 @@ public class SpotlessConfigurator {
         this.logger = logger;
         this.formatterConfig = formatterConfig;
 
-        defaultConfigFile = configExtractor.getLocalConfigFile(SPOTLESS_ECLIPSE_FORMATTER_MADA_XML);
+        defaultConfigFile = configExtractor.getLocalConfigFileFromResource(SPOTLESS_ECLIPSE_FORMATTER_MADA_XML);
     }
 
     /**

@@ -27,6 +27,8 @@ public class CheckstyleConfigurator {
     private final CheckstyleConfiguration checkstyleConfig;
     /** The default configuration file, shipped with this plugin. */
     private final Path defaultConfigFile;
+    /** The default file extractor. */
+    private final ConfigFileExtractor configExtractor;
 
     /**
      * Creates new instance.
@@ -36,11 +38,12 @@ public class CheckstyleConfigurator {
      * @param configExtractor  the configuration extractor
      */
     public CheckstyleConfigurator(Project project, CheckstyleConfiguration checkstyleConfig, ConfigFileExtractor configExtractor) {
+        this.logger = project.getLogger();
         this.project = project;
         this.checkstyleConfig = checkstyleConfig;
-        this.logger = project.getLogger();
-
-        defaultConfigFile = configExtractor.getLocalConfigFile(CHECKSTYLE_CHECKSTYLE_MADA_XML);
+        this.configExtractor = configExtractor;
+        
+        defaultConfigFile = configExtractor.getLocalConfigFileFromResource(CHECKSTYLE_CHECKSTYLE_MADA_XML);
     }
 
     /**
@@ -79,8 +82,10 @@ public class CheckstyleConfigurator {
 
     private Path getActiveConfigfile() {
         String configPath = checkstyleConfig.configPath();
+        logger.lifecycle("checkstyle: {}", configPath);
         if (configPath != null) {
-            return Paths.get(configPath);
+            logger.lifecycle("CONFIG checkstyle from path {}", configPath);
+            return configExtractor.getLocalFileFromConfigPath(configPath);
         } else {
             return defaultConfigFile;
         }
