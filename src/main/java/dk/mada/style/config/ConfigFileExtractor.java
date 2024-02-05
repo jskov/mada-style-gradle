@@ -38,9 +38,11 @@ import org.gradle.api.logging.Logger;
  * A local file is provided as is. A URL is cached (indexed by the checksum of the URL).
  */
 public final class ConfigFileExtractor {
+    private final Logger logger;
+    /** The download connect timeout. */
+    private static final Duration DOWNLOAD_CONNECT_TIMEOUT = Duration.ofSeconds(20);
     /** The checksum properties resource path. */
     private static final String CHECKSUMS_PROPERTIES = "/config/datafile-checksums.properties";
-    private final Logger logger;
     /** The gradle home dir. */
     private final Path gradleHomeDir;
     /** The parsed checksum properties. */
@@ -137,7 +139,7 @@ public final class ConfigFileExtractor {
             logger.debug("Download data from {}", url);
             HttpClient client = HttpClient.newBuilder()
                     .followRedirects(Redirect.NORMAL)
-                    .connectTimeout(Duration.ofSeconds(20))
+                    .connectTimeout(DOWNLOAD_CONNECT_TIMEOUT)
                     .build();
             HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(url)).build();
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
