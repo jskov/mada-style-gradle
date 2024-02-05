@@ -1,7 +1,6 @@
 package dk.mada.style.configurators;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.gradle.api.logging.Logger;
 
@@ -23,6 +22,8 @@ public class SpotlessConfigurator {
     private final FormatterConfiguration formatterConfig;
     /** The default configuration file, shipped with this plugin. */
     private final Path defaultConfigFile;
+    /** The configuration extractor. */
+    private final ConfigFileExtractor configExtractor;
 
     /**
      * Creates new instance.
@@ -34,6 +35,7 @@ public class SpotlessConfigurator {
     public SpotlessConfigurator(Logger logger, FormatterConfiguration formatterConfig, ConfigFileExtractor configExtractor) {
         this.logger = logger;
         this.formatterConfig = formatterConfig;
+        this.configExtractor = configExtractor;
 
         defaultConfigFile = configExtractor.getLocalConfigFileFromResource(SPOTLESS_ECLIPSE_FORMATTER_MADA_XML);
     }
@@ -66,7 +68,7 @@ public class SpotlessConfigurator {
     private Path getActiveConfigfile() {
         String configPath = formatterConfig.eclipseConfigPath();
         if (configPath != null) {
-            return Paths.get(configPath);
+            return configExtractor.getLocalFileFromConfigPath(configPath);
         } else {
             return defaultConfigFile;
         }

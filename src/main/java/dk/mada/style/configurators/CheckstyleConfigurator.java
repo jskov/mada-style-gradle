@@ -1,7 +1,6 @@
 package dk.mada.style.configurators;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -82,9 +81,7 @@ public class CheckstyleConfigurator {
 
     private Path getActiveConfigfile() {
         String configPath = checkstyleConfig.configPath();
-        logger.lifecycle("checkstyle: {}", configPath);
         if (configPath != null) {
-            logger.lifecycle("CONFIG checkstyle from path {}", configPath);
             return configExtractor.getLocalFileFromConfigPath(configPath);
         } else {
             return defaultConfigFile;

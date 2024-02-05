@@ -17,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.HexFormat;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 import org.gradle.api.logging.Logger;
 
@@ -68,19 +69,10 @@ public final class ConfigFileExtractor {
         if (checksum == null) {
             throw new IllegalStateException("Failed to read " + path + " from data checksums: " + dataChecksums);
         }
-
         String resourcePath = "/config/" + path;
-        try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
-            if (is == null) {
-                throw new IllegalStateException("Failed to read config file " + resourcePath);
-            }
-            String txt = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            return storeLocalFile(resourcePath, checksum, txt);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to read config file " + path, e);
-        }
+        return lazyGetLocalFile(resourcePath, checksum, () -> readClassloaderResource(resourcePath));
     }
-
+    
     /**
      * Provides a local file from a configuration path.
      *
@@ -91,9 +83,9 @@ public final class ConfigFileExtractor {
      * @return a local file reference
      */
     public Path getLocalFileFromConfigPath(String path) {
-        logger.lifecycle("READ config path '{}'", path);
         if (path.startsWith("http://") || path.startsWith("https://")) {
-            return copyUrlToLocalFile(path);
+            String safePath = path.replaceAll("[^a-zA-Z0-9.-]", "_");
+            return lazyGetLocalFile(safePath, checksum(path), () -> fetchUrlContent(path));
         } else {
             Path f = Paths.get(path);
             if (Files.isRegularFile(f)) {
@@ -103,29 +95,7 @@ public final class ConfigFileExtractor {
         }
     }
 
-    private Path copyUrlToLocalFile(String url) {
-        try {
-            logger.lifecycle("Get {}", url);
-            HttpClient client = HttpClient.newBuilder()
-                    .followRedirects(Redirect.NORMAL)
-                    .connectTimeout(Duration.ofSeconds(20))
-                    .build();
-            HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(url)).build();
-            HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-            String text = response.body();
-
-            String checksum = checksum(url);
-            String safePath = url.replaceAll("[^a-zA-Z0-9.-]", "_");
-            return storeLocalFile(safePath, checksum, text);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interruped while fetching remote file " + url, e);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to fetch remote file " + url, e);
-        }
-    }
-
-    private Path storeLocalFile(String path, String checksum, String text) {
+    private Path lazyGetLocalFile(String path, String checksum, Supplier<String> supplier) {
         Path madaConfigDir = gradleHomeDir.resolve("mada-data");
         try {
             String suffix = path.substring(path.lastIndexOf('.'));
@@ -137,17 +107,46 @@ public final class ConfigFileExtractor {
                 logger.debug("Already have config file {} : {}", path, targetFile);
                 return targetFile;
             }
-            logger.debug("Missing config file {}, extracting {}", path, targetFile);
+            logger.debug("Missing config file {}, fetching...", path);
 
             Files.createDirectories(madaConfigDir);
             Files.deleteIfExists(targetFile);
 
-            Files.writeString(targetFile, text);
+            Files.writeString(targetFile, supplier.get());
             Files.createFile(markerFile);
 
             return targetFile;
         } catch (IOException e) {
             throw new IllegalStateException("Failed to save " + path + " in " + madaConfigDir, e);
+        }
+    }
+    
+    private String readClassloaderResource(String resourcePath) {
+        try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                throw new IllegalStateException("Failed to read config file " + resourcePath);
+            }
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read resource " + resourcePath, e);
+        }
+    }
+
+    private String fetchUrlContent(String url) {
+        try {
+            logger.debug("Download data from {}", url);
+            HttpClient client = HttpClient.newBuilder()
+                    .followRedirects(Redirect.NORMAL)
+                    .connectTimeout(Duration.ofSeconds(20))
+                    .build();
+            HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(url)).build();
+            HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+            return response.body();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interruped while fetching remote file " + url, e);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to fetch remote file " + url, e);
         }
     }
 
