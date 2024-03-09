@@ -8,7 +8,10 @@ import java.util.stream.Collectors;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.quality.Checkstyle;
+import org.gradle.api.plugins.quality.CheckstylePlugin;
 import org.gradle.api.tasks.TaskContainer;
+import org.gradle.testing.jacoco.plugins.JacocoPlugin;
+import org.gradle.testing.jacoco.tasks.JacocoReport;
 import org.sonarqube.gradle.SonarExtension;
 import org.sonarqube.gradle.SonarTask;
 
@@ -40,15 +43,22 @@ public class SonarConfigurator {
     /**
      * Configures the sonarqube extension.
      *
-     * @param se the spotless extension
+     * @param se the sonarqube extension
      */
     public void configure(SonarExtension se) {
         logger.info("dk.mada.style configure sonar");
 
         TaskContainer taskContainer = project.getTasks();
 
-        // Make sonar depend on checkstyle tasks (we want sonar to run last)
-        taskContainer.withType(SonarTask.class, sonar -> taskContainer.withType(Checkstyle.class, sonar::dependsOn));
+        // Make sonar depend on some other check tasks (we want sonar to run last)
+        project.afterEvaluate(p -> taskContainer.withType(SonarTask.class, sonar -> {
+            if (project.getPlugins().hasPlugin(CheckstylePlugin.class)) {
+                taskContainer.withType(Checkstyle.class, sonar::dependsOn);
+            }
+            if (project.getPlugins().hasPlugin(JacocoPlugin.class)) {
+                taskContainer.withType(JacocoReport.class, sonar::dependsOn);
+            }
+        }));
 
         Map<String, String> inputProps = project.getProperties().entrySet().stream()
                 .filter(e -> !e.getKey().equals("dk.mada.style.sonar.enabled"))
