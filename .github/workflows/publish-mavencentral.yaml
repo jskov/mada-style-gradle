@@ -41,7 +41,8 @@ jobs:
         with:
           # Only write to the cache for builds on the 'main' branch (default - but here for documentation)
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-          arguments: javadoc publish -s
+#          arguments: javadoc publish -s
+          arguments: publish -s
 
       # Signing via bash
       # Avoids sharing credentials with all Gradle plugins/potential annotation processors
