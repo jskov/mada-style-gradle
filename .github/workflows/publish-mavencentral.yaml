@@ -19,12 +19,12 @@ jobs:
           ls -l /tmp
           cat /tmp/a
         env:
-          XXX: ${{ env.TEST_MULTILINE }}
+          XXX: ${{ vars.TEST_MULTILINE }}
 
       - name: List env
         run: env | sort
         env:
-          XXX: ${{ env.TEST_MULTILINE }}
+          XXX: ${{ vars.TEST_MULTILINE }}
         
       - name: Define BUILD_LABEL
         env:
