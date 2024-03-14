@@ -16,7 +16,11 @@ jobs:
       - name: Echo multiline env
         run: |
           echo "$TEST_MULTILINE" > /tmp/a
+          ls -l /tmp
           cat /tmp/a
+      - name: List env
+        run: env | sort
+        
       - name: Define BUILD_LABEL
         env:
           INPUT: ${{ github.head_ref || github.ref_name }}
