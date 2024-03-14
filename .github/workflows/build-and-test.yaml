@@ -16,10 +16,6 @@ jobs:
           INPUT: ${{ github.head_ref || github.ref_name }}
         run: |
           echo "BUILD_LABEL=${INPUT//\//_}" >> $GITHUB_ENV
-      - name: Echo multiline env
-        run: |
-          echo "$TEST_MULTILINE" > /tmp/a
-          cat /tmp/a
     
       - uses: actions/checkout@v4
         with:
