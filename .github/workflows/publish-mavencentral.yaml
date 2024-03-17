@@ -57,14 +57,6 @@ jobs:
 #          arguments: javadoc publish -s
           arguments: publish -s
 
-      # Signing via bash
-      # Avoids sharing credentials with all Gradle plugins/potential annotation processors
-      - name: Sign dist files
-        env:
-          MADA_SIGNING_KEY: ${{ secrets.MADA_SIGNING_KEY }}
-          MADA_SIGNING_PASSWORD: ${{ secrets.MADA_SIGNING_PASSWORD }}
-        run: .github/sign-published-files.sh build/dist ${BUILD_LABEL} F9B879EDFC0AB297588936F49CCE5D89C917DBD4
-
       # Crude upload inspired by https://mccue.dev/pages/6-1-22-upload-to-maven-central
       # Avoids sharing credentials with all Gradle plugins/potential annotation processors
       - name: Upload and Release Bundle
