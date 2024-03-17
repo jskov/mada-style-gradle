@@ -57,7 +57,7 @@ jobs:
 #          arguments: javadoc publish -s
           arguments: publish -s
 
-      - name: show dist
+      - name: show dist2
         run: |
           realpath build/dist
           tree build/dist
