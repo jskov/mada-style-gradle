@@ -65,38 +65,14 @@ jobs:
           MADA_SIGNING_PASSWORD: ${{ secrets.MADA_SIGNING_PASSWORD }}
         run: .github/sign-published-files.sh build/dist ${BUILD_LABEL} F9B879EDFC0AB297588936F49CCE5D89C917DBD4
 
-      # Delete unwanted files (or Nexus will make checksums for checksums)
-      - name: Delete unwanted checksum files
-        run: |
-          find build/dist \( -name "*.md5" -o -name "*.sha1" -o -name "*.sha256" -o -name "*.sha512" \) -exec rm "{}" \;
-
-      - name: Assemble Gradle Metadata Bundle
-        run: |
-          cd build/dist/dk/mada/style/dk.mada.style.gradle.plugin/${BUILD_LABEL}/
-          jar cvf /tmp/bundle-metadata.jar *
-          unzip -t /tmp/bundle-metadata.jar
-
-      - name: Assemble Gradle plugin Bundle
-        run: |
-          cd build/dist/dk/mada/style/mada-style-gradle/${BUILD_LABEL}/
-          jar cvf /tmp/bundle-plugin.jar *
-          unzip -t /tmp/bundle-plugin.jar
-
-      - name: Capture Bundle
-        uses: actions/upload-artifact@v4
-        with:
-          name: bundle
-          path: "/tmp/bundle-*.jar"
-          retention-days: 1
-
       # Crude upload inspired by https://mccue.dev/pages/6-1-22-upload-to-maven-central
       # Avoids sharing credentials with all Gradle plugins/potential annotation processors
       - name: Upload and Release Bundle
-        uses: jskov/action-nexus-publish@main
+        uses: jskov/action-nexus-publish@sign_and_pack
         with:
-          signing_key: 'some magic secret key'
-          signing_key_secret: 'and its secret'
-
+          signing_key: ${{ vars.TEST_SIGNING_KEY }}
+          signing_key_secret: ${{ vars.TEST_SIGNING_KEY_SECRET }}
+          search_directory: build/dist
 #        env:
 #          USERNAME: ${{ secrets.OSSRH_USERNAME }}
 #          PASSWORD: ${{ secrets.OSSRH_TOKEN }}
