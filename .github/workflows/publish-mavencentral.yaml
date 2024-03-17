@@ -70,6 +70,12 @@ jobs:
           signing_key: ${{ vars.TEST_SIGNING_KEY }}
           signing_key_secret: ${{ vars.TEST_SIGNING_KEY_SECRET }}
           search_directory: build/dist
+
+      - name: show dist after
+        run: |
+          realpath build/dist
+          tree build/dist
+
 #        env:
 #          USERNAME: ${{ secrets.OSSRH_USERNAME }}
 #          PASSWORD: ${{ secrets.OSSRH_TOKEN }}
