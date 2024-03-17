@@ -57,6 +57,11 @@ jobs:
 #          arguments: javadoc publish -s
           arguments: publish -s
 
+      - name: show dist
+        run: |
+          realpath build/dist
+          tree build/dist
+
       # Crude upload inspired by https://mccue.dev/pages/6-1-22-upload-to-maven-central
       # Avoids sharing credentials with all Gradle plugins/potential annotation processors
       - name: Upload and Release Bundle
