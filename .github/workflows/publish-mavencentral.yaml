@@ -92,7 +92,7 @@ jobs:
       # Crude upload inspired by https://mccue.dev/pages/6-1-22-upload-to-maven-central
       # Avoids sharing credentials with all Gradle plugins/potential annotation processors
       - name: Upload and Release Bundle
-        uses: jskov/action-nexus-publish@test
+        uses: jskov/action-nexus-publish@main
         with:
           signing_key: 'some magic secret key'
           signing_key_secret: 'and its secret'
