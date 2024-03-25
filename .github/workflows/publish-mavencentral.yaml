@@ -65,12 +65,15 @@ jobs:
       # Crude upload inspired by https://mccue.dev/pages/6-1-22-upload-to-maven-central
       # Avoids sharing credentials with all Gradle plugins/potential annotation processors
       - name: Upload and Release Bundle
-        uses: jskov/action-nexus-publish@sign_and_pack
+        uses: jskov/action-nexus-publish@main
         with:
+          ossrh_username: ${{ secrets.OSSRH_USERNAME }}
+          ossrh_token: ${{ secrets.OSSRH_TOKEN }}
           signing_key: ${{ vars.TEST_SIGNING_KEY }}
           signing_key_secret: ${{ vars.TEST_SIGNING_KEY_SECRET }}
           search_directory: build/dist
           log_level: 'finest'
+          target_action: 'keep'
 
       - name: show dist after
         run: |
