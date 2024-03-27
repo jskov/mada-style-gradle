@@ -13,19 +13,6 @@ jobs:
       contents: write
       packages: write
     steps:
-      - name: Echo multiline env
-        run: |
-          echo "$XXX" > /tmp/a
-          ls -l /tmp
-          cat /tmp/a
-        env:
-          XXX: ${{ vars.TEST_MULTILINE }}
-
-      - name: List env
-        run: env | sort
-        env:
-          XXX: ${{ vars.TEST_MULTILINE }}
-        
       - name: Define BUILD_LABEL
         env:
           INPUT: ${{ github.head_ref || github.ref_name }}
@@ -65,14 +52,14 @@ jobs:
       # Crude upload inspired by https://mccue.dev/pages/6-1-22-upload-to-maven-central
       # Avoids sharing credentials with all Gradle plugins/potential annotation processors
       - name: Upload and Release Bundle
-        uses: jskov/action-nexus-publish@main
+        uses: jskov/action-nexus-publish@tweaks
         with:
           ossrh_username: ${{ secrets.OSSRH_USERNAME }}
           ossrh_token: ${{ secrets.OSSRH_TOKEN }}
-          signing_key: ${{ vars.TEST_SIGNING_KEY }}
-          signing_key_secret: ${{ vars.TEST_SIGNING_KEY_SECRET }}
+          signing_key: ${{ secrets.MADA_SIGNING_KEY }}
+          signing_key_secret: ${{ secrets.MADA_SIGNING_PASSWORD }}
           search_directory: build/dist
-          log_level: 'finest'
+          #log_level: 'finest'
           target_action: 'keep'
 
       - name: show dist after
