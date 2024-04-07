@@ -18,8 +18,6 @@ jobs:
           INPUT: ${{ github.head_ref || github.ref_name }}
         run: |
           echo "BUILD_LABEL=${INPUT//\//_}" >> $GITHUB_ENV
-#      - name: Echo env
-#        run: env | sort
       - uses: actions/checkout@v4
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -41,18 +39,10 @@ jobs:
         with:
           # Only write to the cache for builds on the 'main' branch (default - but here for documentation)
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-#          arguments: javadoc publish -s
-          arguments: publish -s
+          arguments: javadoc publish -s
 
-      - name: show dist2
-        run: |
-          realpath build/dist
-          tree build/dist
-
-      # Crude upload inspired by https://mccue.dev/pages/6-1-22-upload-to-maven-central
-      # Avoids sharing credentials with all Gradle plugins/potential annotation processors
       - name: Upload and Release Bundle
-        uses: jskov/action-nexus-publish@publish
+        uses: jskov/action-nexus-publish@main
         with:
           ossrh_username: ${{ secrets.OSSRH_USERNAME }}
           ossrh_token: ${{ secrets.OSSRH_TOKEN }}
@@ -60,37 +50,3 @@ jobs:
           signing_key_secret: ${{ secrets.SIGNING_KEY_SECRET }}
           search_directory: build/dist
           target_action: 'keep'
-
-      - name: show dist after
-        run: |
-          realpath build/dist
-          tree build/dist
-
-#        env:
-#          USERNAME: ${{ secrets.OSSRH_USERNAME }}
-#          PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-#        run: |
-#          curl --request GET --url https://s01.oss.sonatype.org/service/local/authentication/login \
-#               --cookie-jar cookies.txt --user "${USERNAME}:${PASSWORD}"
-#          repoMetadataId=$(curl --request POST --url https://s01.oss.sonatype.org/service/local/staging/bundle_upload \
-#               --cookie cookies.txt --header 'Content-Type: multipart/form-data' \
-#               --form file=@/tmp/bundle-metadata.jar | jq -r ".repositoryUris[0]" | sed 's/.*\///')
-#          repoPluginId=$(curl --request POST --url https://s01.oss.sonatype.org/service/local/staging/bundle_upload \
-#               --cookie cookies.txt --header 'Content-Type: multipart/form-data' \
-#               --form file=@/tmp/bundle-plugin.jar | jq -r ".repositoryUris[0]" | sed 's/.*\///')
-#          echo "Wait for repos '$repoMetadataId', and '$repoPluginId' to settle.."
-#          # should probe for state change:
-#          #  curl -v -H 'Accept: application/json' /tmp/cookies.txt https://s01.oss.sonatype.org/service/local/staging/repository/dkmada-1104
-#          #  Look for type:closed
-#          sleep 150
-#          echo "Publish NOT completed! Test repo!"
-#          # release - unless tag starts with 0.0.
-#          echo $BUILD_LABEL | grep -q -v -e "^0[.]0[.]" \
-#            && curl --request POST \
-#               --url https://s01.oss.sonatype.org/service/local/staging/bulk/promote \
-#               --cookie cookies.txt \
-#               --header 'Content-Type: application/json' \
-#               --data "{ 'data': { 'autoDropAfterRelease': true, 'description': '', 'stagedRepositoryIds': ['$repoMetadataId', '$repoPluginId'] } }" \
-#            && echo "Publish completed" \
-#            || echo "Publish skipped / failed"
-#          rm -f cookies.txt
