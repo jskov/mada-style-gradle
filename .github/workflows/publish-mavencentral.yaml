@@ -1,10 +1,8 @@
 name: Build and push to MavenCentral
 on:
   push:
-    branches:
-      - publish_play
-#    tags:
-#      - 0.*
+    tags:
+      - 0.*
 
 jobs:
   publish:
