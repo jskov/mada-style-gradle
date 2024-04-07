@@ -16,14 +16,12 @@ jobs:
           INPUT: ${{ github.head_ref || github.ref_name }}
         run: |
           echo "BUILD_LABEL=${INPUT//\//_}" >> $GITHUB_ENV
-#      - name: Echo env
-#        run: env | sort
       - uses: actions/checkout@v4
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@b231772637bb498f11fdbc86052b6e8a8dc9fc92
         # 2.1.2
@@ -41,66 +39,12 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: javadoc publish -s
 
-      # Signing via bash
-      # Avoids sharing credentials with all Gradle plugins/potential annotation processors
-      - name: Sign dist files
-        env:
-          MADA_SIGNING_KEY: ${{ secrets.MADA_SIGNING_KEY }}
-          MADA_SIGNING_PASSWORD: ${{ secrets.MADA_SIGNING_PASSWORD }}
-        run: .github/sign-published-files.sh build/dist ${BUILD_LABEL} F9B879EDFC0AB297588936F49CCE5D89C917DBD4
-
-      # Delete unwanted files (or Nexus will make checksums for checksums)
-      - name: Delete unwanted checksum files
-        run: |
-          find build/dist \( -name "*.md5" -o -name "*.sha1" -o -name "*.sha256" -o -name "*.sha512" \) -exec rm "{}" \;
-
-      - name: Assemble Gradle Metadata Bundle
-        run: |
-          cd build/dist/dk/mada/style/dk.mada.style.gradle.plugin/${BUILD_LABEL}/
-          jar cvf /tmp/bundle-metadata.jar *
-          unzip -t /tmp/bundle-metadata.jar
-
-      - name: Assemble Gradle plugin Bundle
-        run: |
-          cd build/dist/dk/mada/style/mada-style-gradle/${BUILD_LABEL}/
-          jar cvf /tmp/bundle-plugin.jar *
-          unzip -t /tmp/bundle-plugin.jar
-
-      - name: Capture Bundle
-        uses: actions/upload-artifact@v4
-        with:
-          name: bundle
-          path: "/tmp/bundle-*.jar"
-          retention-days: 1
-
-      # Crude upload inspired by https://mccue.dev/pages/6-1-22-upload-to-maven-central
-      # Avoids sharing credentials with all Gradle plugins/potential annotation processors
       - name: Upload and Release Bundle
-        env:
-          USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-        run: |
-          curl --request GET --url https://s01.oss.sonatype.org/service/local/authentication/login \
-               --cookie-jar cookies.txt --user "${USERNAME}:${PASSWORD}"
-          repoMetadataId=$(curl --request POST --url https://s01.oss.sonatype.org/service/local/staging/bundle_upload \
-               --cookie cookies.txt --header 'Content-Type: multipart/form-data' \
-               --form file=@/tmp/bundle-metadata.jar | jq -r ".repositoryUris[0]" | sed 's/.*\///')
-          repoPluginId=$(curl --request POST --url https://s01.oss.sonatype.org/service/local/staging/bundle_upload \
-               --cookie cookies.txt --header 'Content-Type: multipart/form-data' \
-               --form file=@/tmp/bundle-plugin.jar | jq -r ".repositoryUris[0]" | sed 's/.*\///')
-          echo "Wait for repos '$repoMetadataId', and '$repoPluginId' to settle.."
-          # should probe for state change:
-          #  curl -v -H 'Accept: application/json' /tmp/cookies.txt https://s01.oss.sonatype.org/service/local/staging/repository/dkmada-1104
-          #  Look for type:closed
-          sleep 150
-          echo "Publish NOT completed! Test repo!"
-          # release - unless tag starts with 0.0.
-          echo $BUILD_LABEL | grep -q -v -e "^0[.]0[.]" \
-            && curl --request POST \
-               --url https://s01.oss.sonatype.org/service/local/staging/bulk/promote \
-               --cookie cookies.txt \
-               --header 'Content-Type: application/json' \
-               --data "{ 'data': { 'autoDropAfterRelease': true, 'description': '', 'stagedRepositoryIds': ['$repoMetadataId', '$repoPluginId'] } }" \
-            && echo "Publish completed" \
-            || echo "Publish skipped / failed"
-          rm -f cookies.txt
+        uses: jskov/action-nexus-publish@f93f3a76488c83729461bc6274cb8d43e9abe34a
+        with:
+          ossrh_username: ${{ secrets.OSSRH_USERNAME }}
+          ossrh_token: ${{ secrets.OSSRH_TOKEN }}
+          signing_key: ${{ secrets.SIGNING_KEY }}
+          signing_key_secret: ${{ secrets.SIGNING_KEY_SECRET }}
+          search_directory: build/dist
+          target_action: 'promote_or_keep'
