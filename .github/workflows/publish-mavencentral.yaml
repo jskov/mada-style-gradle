@@ -42,7 +42,7 @@ jobs:
           arguments: javadoc publish -s
 
       - name: Upload and Release Bundle
-        uses: jskov/action-nexus-publish@main
+        uses: jskov/action-nexus-publish@f93f3a76488c83729461bc6274cb8d43e9abe34a
         with:
           ossrh_username: ${{ secrets.OSSRH_USERNAME }}
           ossrh_token: ${{ secrets.OSSRH_TOKEN }}
