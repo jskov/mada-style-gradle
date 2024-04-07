@@ -1,7 +1,7 @@
 plugins {
     id 'com.gradle.plugin-publish' version '1.2.1'
     id 'eclipse'
-    id 'dk.mada.style' version '0.9.4'
+    id 'dk.mada.style' version '0.9.5'
 }
 
 ext {
@@ -30,12 +30,12 @@ dependencies {
     implementation "net.ltgt.gradle:gradle-errorprone-plugin:3.1.0"
 
     // sonar
-    implementation "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:4.4.1.3373"
+    implementation "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:5.0.0.4638"
 
     // dependencies added by the plugin
     // not used in the plugin code, but here Dependabot will keep them up to date
-    addedDependencies "com.uber.nullaway:nullaway:0.10.24@jar"
-    addedDependencies "com.google.errorprone:error_prone_core:2.25.0@jar"
+    addedDependencies "com.uber.nullaway:nullaway:0.10.25@jar"
+    addedDependencies "com.google.errorprone:error_prone_core:2.26.1@jar"
 
     compileOnly    "org.jspecify:jspecify:0.3.0"
 }
