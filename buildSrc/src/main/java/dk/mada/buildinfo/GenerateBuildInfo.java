@@ -2,35 +2,34 @@ package dk.mada.buildinfo;
 
 import static java.util.stream.Collectors.toMap;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import javax.inject.Inject;
+
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
-import org.gradle.api.file.Directory;
 import org.gradle.api.file.ProjectLayout;
+import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.provider.Property;
-import org.gradle.api.provider.Provider;
 import org.gradle.api.publish.PublicationContainer;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenArtifact;
 import org.gradle.api.publish.maven.MavenPom;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
-import org.gradle.api.tasks.InputFile;
+import org.gradle.api.publish.tasks.GenerateModuleMetadata;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
@@ -99,9 +98,12 @@ public abstract class GenerateBuildInfo extends DefaultTask {
     // See https://reproducible-builds.org/docs/jvm/ ('.buildinfo file' section)
     private String build(MavenPublication primaryPub, List<MavenPublication> publications) {
         Property<String> cloneConnection = getProject().getObjects().property(String.class);
-        
+
+        Map<MavenPom, Path> moduleLocations = getModulePaths();
         Map<MavenPom, Path> pomLocations = getPomFileLocations();
-        logger.lifecycle("FINAL pom locations: {}", pomLocations);
+
+        logger.lifecycle("MODULES: {}", moduleLocations);
+        logger.lifecycle("POMs: {}", pomLocations);
         
         primaryPub.getPom().scm(mps -> {
             cloneConnection.set(mps.getDeveloperConnection());
@@ -145,14 +147,17 @@ public abstract class GenerateBuildInfo extends DefaultTask {
 
             output = output + "outputs." + pubNo + ".coordinates=" + coords + NL;
 
+            int artNo = 0;
+
             Path pomFile = pomLocations.get(pub.getPom());
-            if (pomFile == null) {
-                throw new IllegalStateException("Failed to find file location for POM " + coords);
+            if (pomFile != null) {
+                output = output + renderArtifact(pubNo, artNo++, pomFile, pub.getArtifactId() + "-" + project.getVersion() + ".pom");
+            }
+            Path moduleFile = moduleLocations.get(pub.getPom());
+            if (moduleFile != null) {
+                output = output + renderArtifact(pubNo, artNo++, moduleFile, pub.getArtifactId() + "-" + project.getVersion() + ".module");
             }
             
-            int artNo = 0;
-            output = output + renderArtifact(pubNo, artNo++, pomFile, pub.getArtifactId() + "-" + project.getVersion() + ".pom");
-            // FIXME: add .module if present
             for (MavenArtifact ma : pub.getArtifacts()) {
                 output = output + renderArtifact(pubNo, artNo++, ma.getFile().toPath());
             }
@@ -163,6 +168,18 @@ public abstract class GenerateBuildInfo extends DefaultTask {
         return output;
     }
 
+    private Map<MavenPom, Path> getModulePaths() {
+        Map<MavenPom, Path> result = new HashMap<>();
+        for (GenerateModuleMetadata task : project.getTasks().withType(GenerateModuleMetadata.class)) {
+            Path moduleFile = task.getOutputFile().get().getAsFile().toPath();
+            if (Files.isRegularFile(moduleFile)
+                    && task.getPublication().getOrNull() instanceof MavenPublication mp) {
+                result.put(mp.getPom(), moduleFile);
+            }
+        }
+        return result;
+    }
+    
     private String renderArtifact(int pubNo, int artNo, Path file) {
         return renderArtifact(pubNo, artNo, file, file.getFileName().toString());
     }
