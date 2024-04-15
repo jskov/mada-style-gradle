@@ -1,5 +1,7 @@
 package dk.mada.buildinfo;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -24,6 +27,7 @@ import org.gradle.api.publish.PublicationContainer;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPom;
 import org.gradle.api.publish.maven.MavenPublication;
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -88,9 +92,13 @@ public abstract class GenerateBuildInfo extends DefaultTask {
             e.printStackTrace();
         }
     }
-    
+
+    // Used by reproducible-central
+    // See https://reproducible-builds.org/docs/jvm/ ('.buildinfo file' section)
     private String build(MavenPublication primaryPub, List<MavenPublication> publications) {
         Property<String> cloneConnection = getProject().getObjects().property(String.class);
+        
+        Map<MavenPom, Path> pomLocations = getPomFileLocations();
         
         primaryPub.getPom().scm(mps -> {
             cloneConnection.set(mps.getDeveloperConnection());
@@ -123,19 +131,28 @@ public abstract class GenerateBuildInfo extends DefaultTask {
                 .replace("@JAVA_VENDOR@", System.getProperty("java.vendor"))
                 .replace("@OS_NAME@", System.getProperty("os.name"))
                 ;
+
+
+        
         
         String output = header;
         int publicationIx = 0;
         for (MavenPublication pub : publications) {
-            output = output + "outputs." + publicationIx + ".coordinates=" + pub.getGroupId() + ":" + pub.getArtifactId() + NL;
+            logger.lifecycle("POM: {}", pub.getPom());
+
+            String coords = pub.getGroupId() + ":" + pub.getArtifactId();
+            Path pomFile = pomLocations.get(pub.getPom());
+            if (pomFile == null) {
+                throw new IllegalStateException("Failed to find file location for POM " + coords);
+            }
+
+            output = output + "outputs." + publicationIx + ".coordinates=" + coords + NL;
             
             int artifactIx = 0;
             for (var art : pub.getArtifacts()) {
-                String prefix = "outputs." + publicationIx + "." + artifactIx;
-                output = output + prefix + ".filename=" + art.getFile().getName() + NL;
-                output = output + prefix + ".length=" + art.getFile().length() + NL;
-                output = output + prefix + ".checksums.sha512=" + sha512sum(art.getFile()) + NL;
-                artifactIx++;
+                File file = art.getFile();
+                
+                output = output + publication(publicationIx, artifactIx++, file.toPath());
             }
 
             publicationIx++;
@@ -143,11 +160,35 @@ public abstract class GenerateBuildInfo extends DefaultTask {
         
         return output;
     }
+
+    private String publication(int pubNo, int artNo, Path file) {
+        String prefix = "outputs." + pubNo + "." + artNo;
+        return prefix + ".filename=" + file.getFileName() + NL
+                + prefix + ".length=" + size(file) + NL
+                + prefix + ".checksums.sha512=" + sha512sum(file) + NL;
+    }
     
-    private String sha512sum(File file) {
+    private Map<MavenPom, Path> getPomFileLocations() {
+        return project.getTasks().withType(GenerateMavenPom.class).stream()
+            .collect(toMap(gmp -> gmp.getPom(), gmp -> gmp.getDestination().toPath()));
+    }
+
+    record X(String coord, List<Path> files) {
+        
+    }
+    
+    private long size(Path file) {
+        try {
+            return Files.size(file);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to get size of file " + file, e);
+        }
+    }
+    
+    private String sha512sum(Path file) {
         MessageDigest md;
         byte[] buffer = new byte[8192];
-        try (InputStream is = Files.newInputStream(file.toPath())) {
+        try (InputStream is = Files.newInputStream(file)) {
             md = MessageDigest.getInstance("SHA-512");
             int read;
             while ((read = is.read(buffer)) > 0) {

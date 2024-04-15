@@ -18,7 +18,8 @@ public class BuildInfoPlugin implements Plugin<Project> {
             p.getTasks().withType(GenerateMavenPom.class).configureEach(t -> {
                 logger.lifecycle("config {}", t.getName());
                 MavenPom pom = t.getPom();
-                logger.lifecycle(" name: {}", pom.getName());
+                
+                logger.lifecycle(" name: {} {}", pom.getName(), pom);
                 logger.lifecycle(" dest: {}", t.getDestination());
             });
         });
