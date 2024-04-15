@@ -2,6 +2,7 @@ plugins {
     id 'com.gradle.plugin-publish' version '1.2.1'
     id 'eclipse'
     id 'dk.mada.style' version '0.9.6'
+    id 'dk.mada.buildinfo'
 }
 
 ext {
@@ -149,8 +150,8 @@ AssetInfo collectInfo(String group, String name, String suffix) {
 }
 
 def assets = [ 
- collectInfo('dk.mada.style', 'dk.mada.style.gradle.plugin', '.pom'),
- collectInfo('dk.mada.style', 'mada-style-gradle', '.pom')
+// collectInfo('dk.mada.style', 'dk.mada.style.gradle.plugin', '.pom'),
+// collectInfo('dk.mada.style', 'mada-style-gradle', '.pom')
  ]
 
 

@@ -1,0 +1,13 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+gradlePlugin {
+    plugins {
+        buildInfoPlugin {
+            id = 'dk.mada.buildinfo'
+            implementationClass = 'dk.mada.buildinfo.BuildInfoPlugin'
+        }
+    }
+}
+
