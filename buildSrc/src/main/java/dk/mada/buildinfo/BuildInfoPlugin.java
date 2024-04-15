@@ -7,6 +7,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.publish.PublicationContainer;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPom;
+import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
 import org.gradle.jvm.component.internal.DefaultJvmSoftwareComponent;
 
@@ -28,12 +29,26 @@ public class BuildInfoPlugin implements Plugin<Project> {
         
         logger.lifecycle(" on {}", project);
         
-        PublishingExtension pubs = project.getExtensions().getByType(PublishingExtension.class);
         
-        PublicationContainer publications = pubs.getPublications();
-        
-        publications.forEach(p -> {
-            logger.lifecycle(" x: {}", p.getName());
+        project.afterEvaluate(pr -> {
+            PublishingExtension pubs = project.getExtensions().getByType(PublishingExtension.class);
+            PublicationContainer publications = pubs.getPublications();
+            logger.lifecycle(" publications: {}", publications);
+            publications.whenObjectAdded(x -> logger.lifecycle("LATER {}", x));
+            publications.forEach(p -> {
+                logger.lifecycle(" x: {} {}", p.getName(), p);
+                if (p instanceof MavenPublication mp) {
+                    logger.lifecycle("  {}:{}", mp.getGroupId(), mp.getArtifactId());
+                    mp.getArtifacts().forEach(ma -> {
+                        logger.lifecycle("  ma:{}", ma.getFile());
+                        
+                    });
+                    logger.lifecycle("  {}", mp.getPom());
+                }
+                
+                
+                
+            });
             
         });
         
