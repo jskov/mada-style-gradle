@@ -11,6 +11,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -25,6 +26,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.publish.PublicationContainer;
 import org.gradle.api.publish.PublishingExtension;
+import org.gradle.api.publish.maven.MavenArtifact;
 import org.gradle.api.publish.maven.MavenPom;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
@@ -99,6 +101,7 @@ public abstract class GenerateBuildInfo extends DefaultTask {
         Property<String> cloneConnection = getProject().getObjects().property(String.class);
         
         Map<MavenPom, Path> pomLocations = getPomFileLocations();
+        logger.lifecycle("FINAL pom locations: {}", pomLocations);
         
         primaryPub.getPom().scm(mps -> {
             cloneConnection.set(mps.getDeveloperConnection());
@@ -133,37 +136,40 @@ public abstract class GenerateBuildInfo extends DefaultTask {
                 ;
 
 
-        
+        // ./gradlew -Pversion=0.0.0 generateBuildInfo ; cat build/buildinfo/mada-style-gradle-0.0.0.buildinfo
         
         String output = header;
-        int publicationIx = 0;
+        int pubNo = 0;
         for (MavenPublication pub : publications) {
-            logger.lifecycle("POM: {}", pub.getPom());
-
             String coords = pub.getGroupId() + ":" + pub.getArtifactId();
+
+            output = output + "outputs." + pubNo + ".coordinates=" + coords + NL;
+
             Path pomFile = pomLocations.get(pub.getPom());
             if (pomFile == null) {
                 throw new IllegalStateException("Failed to find file location for POM " + coords);
             }
-
-            output = output + "outputs." + publicationIx + ".coordinates=" + coords + NL;
             
-            int artifactIx = 0;
-            for (var art : pub.getArtifacts()) {
-                File file = art.getFile();
-                
-                output = output + publication(publicationIx, artifactIx++, file.toPath());
+            int artNo = 0;
+            output = output + renderArtifact(pubNo, artNo++, pomFile, pub.getArtifactId() + "-" + project.getVersion() + ".pom");
+            // FIXME: add .module if present
+            for (MavenArtifact ma : pub.getArtifacts()) {
+                output = output + renderArtifact(pubNo, artNo++, ma.getFile().toPath());
             }
 
-            publicationIx++;
+            pubNo++;
         }
         
         return output;
     }
 
-    private String publication(int pubNo, int artNo, Path file) {
+    private String renderArtifact(int pubNo, int artNo, Path file) {
+        return renderArtifact(pubNo, artNo, file, file.getFileName().toString());
+    }
+
+    private String renderArtifact(int pubNo, int artNo, Path file, String filename) {
         String prefix = "outputs." + pubNo + "." + artNo;
-        return prefix + ".filename=" + file.getFileName() + NL
+        return prefix + ".filename=" + filename + NL
                 + prefix + ".length=" + size(file) + NL
                 + prefix + ".checksums.sha512=" + sha512sum(file) + NL;
     }

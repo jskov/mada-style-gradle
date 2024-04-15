@@ -4,7 +4,9 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.publish.maven.MavenPom;
+import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository;
 import org.gradle.api.tasks.TaskProvider;
 
 public class BuildInfoPlugin implements Plugin<Project> {
@@ -22,6 +24,17 @@ public class BuildInfoPlugin implements Plugin<Project> {
                 logger.lifecycle(" name: {} {}", pom.getName(), pom);
                 logger.lifecycle(" dest: {}", t.getDestination());
             });
+
+            p.getTasks().withType(PublishToMavenRepository.class).configureEach(t -> {
+                logger.lifecycle("config {}", t.getName());
+                
+                MavenPublication pub = t.getPublication();
+                logger.lifecycle(" pub: {}", pub);
+                logger.lifecycle(" id: {}", pub.getArtifactId());
+                logger.lifecycle(" arts: {}", pub.getArtifacts());
+                logger.lifecycle(" outs: {}", t.getOutputs().getFiles());
+            });
+
         });
         
         logger.lifecycle(" on {}", project);
