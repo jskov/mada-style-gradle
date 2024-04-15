@@ -100,6 +100,12 @@ public abstract class GenerateBuildInfo extends DefaultTask {
             artifact-id=@ARTIFACT@
             version=@VERSION@
 
+            build-tool=gradle
+
+            java.version=@JAVA_VERSION@
+            java.vendor=@JAVA_VENDOR@
+            os.name=@OS_NAME@
+
             source.scm.uri=@GIT_URI@
             source.scm.tag=@VERSION@
 
@@ -111,6 +117,10 @@ public abstract class GenerateBuildInfo extends DefaultTask {
                 .replace("@ARTIFACT@", primaryPub.getArtifactId())
                 .replace("@VERSION@", Objects.toString(project.getVersion()))
                 .replace("@GIT_URI@", cloneConnection.get())
+                .replace("@JAVA_VERSION@", System.getProperty("java.version"))
+                .replace("@JAVA_VENDOR@", System.getProperty("java.vendor"))
+                .replace("@OS_NAME@", System.getProperty("os.name"))
+                
                 ;
     }
 }
