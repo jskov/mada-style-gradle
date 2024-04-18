@@ -26,8 +26,15 @@ jobs:
         with:
           validate-wrappers: true
 
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
       - name: Run tests
-        run: ./gradlew check javadoc publish -s -Pversion=${BUILD_LABEL//\//_}
+        run: ./gradlew check javadoc publish sonar -s -Pversion=${BUILD_LABEL//\//_}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
