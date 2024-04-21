@@ -109,3 +109,9 @@ project.afterEvaluate { p ->
 }
 
 tasks.eclipse.doLast { project.mkdir("build/pluginUnderTestMetadata") }
+
+String digest(File f) {
+    byte[] b = f.readBytes()
+    byte[] d = java.security.MessageDigest.getInstance("SHA-256").digest(b)
+    return java.util.HexFormat.of().formatHex(d)
+}
