@@ -2,8 +2,6 @@ pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
-        maven { url "https://s01.oss.sonatype.org/content/repositories/dkmada-1255" }
-        maven { url "https://s01.oss.sonatype.org/content/repositories/dkmada-1256" }
         mavenLocal()
     }
 }
