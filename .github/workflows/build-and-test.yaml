@@ -36,7 +36,10 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Run tests
-        run: ./gradlew check javadoc publish sonar -s -Pversion=${BUILD_LABEL//\//_}
+        run: |
+          umask
+          ./gradlew check javadoc publish sonar -s -Pversion=${BUILD_LABEL//\//_}
+          find build/classes -exec ls -la {} \;
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

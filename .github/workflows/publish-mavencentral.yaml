@@ -27,9 +27,7 @@ jobs:
           validate-wrappers: true
 
       - name: Build release
-        run: |
-          umask
-          ./gradlew javadoc publish -s -Pversion=${BUILD_LABEL//\//_}
+        run: ./gradlew javadoc publish -s -Pversion=${BUILD_LABEL//\//_}
         env:
           BUILD_LABEL: ${{ github.head_ref || github.ref_name }}
 
