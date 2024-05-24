@@ -64,12 +64,14 @@ public class PluginConfiguration {
     /**
      * Formatter configuration.
      *
-     * @param enabled           flag to activate formatter
-     * @param include           Ant-style pattern for sources to format
-     * @param exclude           Ant-style pattern for sources to ignore
-     * @param eclipseConfigPath an optional path to an eclipse configuration file
+     * @param enabled            flag to activate formatter
+     * @param include            Ant-style pattern for sources to format
+     * @param exclude            Ant-style pattern for sources to ignore
+     * @param eclipseConfigPath  an optional path to an eclipse configuration file
+     * @param eclipse429P2mirror an optional URL to a eclipse update P2 repository
      */
-    public record FormatterConfiguration(boolean enabled, String include, String exclude, @Nullable String eclipseConfigPath) {
+    public record FormatterConfiguration(boolean enabled, String include, String exclude, @Nullable String eclipseConfigPath,
+            @Nullable String eclipse429P2mirror) {
     }
 
     /**
@@ -124,7 +126,8 @@ public class PluginConfiguration {
                 getBoolProperty("formatter.enabled", true),
                 getProperty("formatter.include", "src/main/java/**/*.java"),
                 getProperty("formatter.exclude", ""),
-                getNullableProperty("formatter.eclipse-config-path", null));
+                getNullableProperty("formatter.eclipse-config-path", null),
+                getNullableProperty("formatter.eclipse-429-p2-url", null));
 
         nullcheckerConf = new NullcheckerConfiguration(
                 getBoolProperty("null-checker.enabled", true),

@@ -1,10 +1,12 @@
 package dk.mada.style.configurators;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 import org.gradle.api.logging.Logger;
 
 import com.diffplug.gradle.spotless.JavaExtension;
+import com.diffplug.gradle.spotless.JavaExtension.EclipseConfig;
 import com.diffplug.gradle.spotless.SpotlessExtension;
 
 import dk.mada.style.config.ConfigFileExtractor;
@@ -61,7 +63,14 @@ public class SpotlessConfigurator {
         je.target(include);
         je.targetExclude(exclude);
 
-        je.eclipse().configFile(configFile);
+        EclipseConfig eclipseConfig = je.eclipse();
+        eclipseConfig.configFile(configFile);
+
+        String p2Mirror = formatterConfig.eclipse429P2mirror();
+        if (p2Mirror != null) {
+            eclipseConfig.withP2Mirrors(Map.of("https://download.eclipse.org/eclipse/updates/4.29/", p2Mirror));
+        }
+
         je.formatAnnotations(); // Note that this *must* come after the java formatter configuration
     }
 
