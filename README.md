@@ -1,5 +1,5 @@
 # mada-style-gradle
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jskov_buildinfo-gradle&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jskov_mada-style-gradle)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jskov_mada-style-gradle&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jskov_mada-style-gradle)
 [![Reproducible Builds](https://img.shields.io/badge/Reproducible_Builds-ok-success?labelColor=1e5b96)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/dk/mada/style/mada-style-gradle/README.md)
 
 A Gradle plugin that enables and configures a number of code style and quality plugins for java development.
