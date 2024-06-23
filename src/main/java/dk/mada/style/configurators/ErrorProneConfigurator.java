@@ -84,6 +84,7 @@ public class ErrorProneConfigurator {
             er.check("NullAway", CheckSeverity.ERROR);
             er.option("NullAway:AnnotatedPackages", makeValidNoSpaceString(nullcheckerConfig.includePackages()));
             er.option("NullAway:UnannotatedSubPackages", makeValidNoSpaceString(nullcheckerConfig.excludePackages()));
+            er.option("NullAway:ExcludedFieldAnnotations", makeValidNoSpaceString(nullcheckerConfig.excludedFieldAnnotations()));
         }
     }
 

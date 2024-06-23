@@ -77,11 +77,13 @@ public class PluginConfiguration {
     /**
      * Null-checker configuration.
      *
-     * @param enabled         flag to activate null-checker
-     * @param includePackages a comma-separated list of packages to scan
-     * @param excludePackages a comma-separated list of packages to ignore
+     * @param enabled                  flag to activate null-checker
+     * @param includePackages          a comma-separated list of packages to scan (restricted regexp syntax)
+     * @param excludePackages          a comma-separated list of packages to ignore (restricted regexp syntax)
+     * @param excludedFieldAnnotations a comma-seaparated list of classes to ignore (restricted regexp syntax)
      */
-    public record NullcheckerConfiguration(boolean enabled, String includePackages, String excludePackages) {
+    public record NullcheckerConfiguration(boolean enabled, String includePackages, String excludePackages,
+            String excludedFieldAnnotations) {
     }
 
     /**
@@ -132,7 +134,8 @@ public class PluginConfiguration {
         nullcheckerConf = new NullcheckerConfiguration(
                 getBoolProperty("null-checker.enabled", true),
                 getProperty("null-checker.include-packages", "dk"),
-                getProperty("null-checker.exclude-packages", ""));
+                getProperty("null-checker.exclude-packages", ""),
+                getProperty("null-checker.exclude-field-annotations", ""));
 
         sonarConf = new SonarConfiguration(
                 getBoolProperty("sonar.enabled", true),
