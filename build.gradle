@@ -31,7 +31,7 @@ dependencies {
     implementation "net.ltgt.gradle:gradle-errorprone-plugin:4.0.0"
 
     // sonar
-    implementation "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:5.0.0.4638"
+    implementation "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:5.1.0.4882"
 
     // dependencies added by the plugin
     // not used in the plugin code, but here Dependabot will keep them up to date
