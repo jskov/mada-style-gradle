@@ -31,7 +31,7 @@ And make sure the plugin can be fetched from MavenCentral:
 
 For null-checker annotations, you should add the [JSpecify](https://jspecify.dev/) dependency:
 
-    compileOnly    "org.jspecify:jspecify:0.3.0"
+    compileOnly    "org.jspecify:jspecify:1.0.0"
 
 Note that the annotations are not as easy to remove as the plugin (since they will be spread out over various source files).
 
