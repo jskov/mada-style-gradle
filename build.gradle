@@ -24,21 +24,22 @@ configurations {
 }
 
 dependencies {
-    // formatter
-    implementation "com.diffplug.spotless:spotless-plugin-gradle:6.25.0"
+    // Depending on these plugins
+    implementation    (libs.errorpronePlugin)
+    implementation    (libs.sonarPlugin)
+    implementation    (libs.spotlessPlugin)
 
-    // null-checker
-    implementation "net.ltgt.gradle:gradle-errorprone-plugin:4.0.1"
+    // Dependencies added by this plugin to its clients
+    // These are not used in this plugin code, but here Dependabot will keep them up to date.
+    // The versions are stored in config/datafile-dependencies.properties read by ErrorProneConfigurator.
+    addedDependencies (libs.nullaway) {
+        transitive = false
+    }
+    addedDependencies (libs.errorproneCore) {
+        transitive = false
+    }
 
-    // sonar
-    implementation "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:5.1.0.4882"
-
-    // dependencies added by the plugin
-    // not used in the plugin code, but here Dependabot will keep them up to date
-    addedDependencies "com.uber.nullaway:nullaway:0.11.3@jar"
-    addedDependencies "com.google.errorprone:error_prone_core:2.33.0@jar"
-
-    compileOnly    "org.jspecify:jspecify:1.0.0"
+    compileOnly       (libs.jspecify)
 }
 
 processResources {
