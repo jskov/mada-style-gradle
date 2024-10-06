@@ -1,6 +1,7 @@
 package dk.mada.style.configurators;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 import org.gradle.api.logging.Logger;
@@ -54,8 +55,8 @@ public class SpotlessConfigurator {
     }
 
     private void configureJava(JavaExtension je) {
-        String include = formatterConfig.include();
-        String exclude = formatterConfig.exclude();
+        List<String> include = formatterConfig.includes();
+        List<String> exclude = formatterConfig.excludes();
         Path configFile = getActiveConfigfile();
         logger.debug("Spotless java config: {}", configFile);
         logger.debug("Spotless java include:{} exclude:{}", include, exclude);
