@@ -65,12 +65,12 @@ public class PluginConfiguration {
      * Formatter configuration.
      *
      * @param enabled            flag to activate formatter
-     * @param include            Ant-style pattern for sources to format
-     * @param exclude            Ant-style pattern for sources to ignore
+     * @param includes           Ant-style patterns for sources to format
+     * @param excludes           Ant-style patterns for sources to ignore
      * @param eclipseConfigPath  an optional path to an eclipse configuration file
      * @param eclipse429P2mirror an optional URL to a eclipse update P2 repository
      */
-    public record FormatterConfiguration(boolean enabled, String include, String exclude, @Nullable String eclipseConfigPath,
+    public record FormatterConfiguration(boolean enabled, List<String> includes, List<String> excludes, @Nullable String eclipseConfigPath,
             @Nullable String eclipse429P2mirror) {
     }
 
@@ -126,8 +126,8 @@ public class PluginConfiguration {
 
         formatterConf = new FormatterConfiguration(
                 getBoolProperty("formatter.enabled", true),
-                getProperty("formatter.include", "src/main/java/**/*.java"),
-                getProperty("formatter.exclude", ""),
+                getListProperty("formatter.include", List.of("src/main/java/**/*.java", "src/test/java/**/*.java")),
+                getListProperty("formatter.exclude", List.of()),
                 getNullableProperty("formatter.eclipse-config-path", null),
                 getNullableProperty("formatter.eclipse-429-p2-url", null));
 

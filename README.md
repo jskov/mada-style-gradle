@@ -97,10 +97,10 @@ By default uses [this configuration](./src/main/resources/config/spotless/eclips
 
 * `dk.mada.style.formatter.enabled = true`  
  Boolean flag allowing the formatter to be disabled
-* `dk.mada.style.formatter.include = src/main/java/**/*.java`  
- Ant-style include pattern for files to format
+* `dk.mada.style.formatter.include = src/main/java/**/*.java, src/test/java/**/*.java`  
+ Comma-separated Ant-style include patterns for files to format
 * `dk.mada.style.formatter.exclude = `  
- Ant-style exclude pattern for files to not format
+ Comma-separated Ant-style exclude patterns for files to not format
 * `dk.mada.style.formatter.eclipse-config-path = null`  
  Optional path to an alternative eclipse formatter configuration file
  This can be a URL; the content will be downloaded and cached (so if you want to update the content, you must change the URL)
