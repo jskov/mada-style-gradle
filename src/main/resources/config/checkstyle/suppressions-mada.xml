@@ -4,5 +4,5 @@
     "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
     <!-- More leniency for test sources -->
-    <suppress checks="(Javadoc|LineLength|MagicNumber)"  files="dk[\\/]mada[\\/](accept|fixture|unit)[\\/].*java" />
+    <suppress checks="(Javadoc|LineLength|MagicNumber)"  files="dk[\\/].*[\\/](accept|fixture|unit)[\\/].*java" />
 </suppressions>
