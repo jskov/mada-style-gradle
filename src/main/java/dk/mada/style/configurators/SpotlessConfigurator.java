@@ -40,7 +40,7 @@ public class SpotlessConfigurator {
         this.formatterConfig = formatterConfig;
         this.configExtractor = configExtractor;
 
-        defaultConfigFile = configExtractor.getLocalConfigFileFromResource(SPOTLESS_ECLIPSE_FORMATTER_MADA_XML);
+        defaultConfigFile = configExtractor.getLocalConfigFileFromResource(SPOTLESS_ECLIPSE_FORMATTER_MADA_XML, Map.of());
     }
 
     /**

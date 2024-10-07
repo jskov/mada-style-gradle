@@ -1,6 +1,7 @@
 package dk.mada.style.configurators;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Objects;
 
 import org.gradle.api.Project;
@@ -46,8 +47,20 @@ public class CheckstyleConfigurator {
         this.checkstyleConfig = checkstyleConfig;
         this.configExtractor = configExtractor;
 
-        defaultConfigFile = configExtractor.getLocalConfigFileFromResource(CHECKSTYLE_CHECKSTYLE_MADA_XML);
+        
+        defaultConfigFile = configExtractor.getLocalConfigFileFromResource(CHECKSTYLE_CHECKSTYLE_MADA_XML, Map.of());
+
         // The suppressions file is references from the config file
+        String suppressionFiles = checkstyleConfig.testSuppressionFiles().replace("/", "[\\\\/]");
+        String suppressionChecks = checkstyleConfig.testSuppressionChecks();
+        Map<String, String> variables = Map.of(
+                "@"
+                );
+        
+        FIXME:
+            // This instead needs to create a suppressions file in the projects' build folder
+            // and instruct checkstyle to use it via the option variable (sun.whatever)
+        
         configExtractor.getLocalConfigFileFromResource(CHECKSTYLE_SUPPRESSIONS_MADA_XML);
     }
 

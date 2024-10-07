@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.HexFormat;
+import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 
@@ -65,14 +66,15 @@ public final class ConfigFileExtractor {
      * {@return a local file for the given configuration resource path}
      *
      * @param path the resource path
+     * @param variables the variables to expand in the resource
      */
-    public Path getLocalConfigFileFromResource(String path) {
+    public Path getLocalConfigFileFromResource(String path, Map<String, String> variables) {
         String checksum = dataChecksums.getProperty(path);
         if (checksum == null) {
             throw new IllegalStateException("Failed to read " + path + " from data checksums: " + dataChecksums);
         }
         String resourcePath = "/config/" + path;
-        return lazyGetLocalFile(resourcePath, checksum, () -> readClassloaderResource(resourcePath));
+        return lazyGetLocalFile(resourcePath, checksum, () -> readClassloaderResource(resourcePath), variables);
     }
 
     /**
@@ -87,7 +89,7 @@ public final class ConfigFileExtractor {
     public Path getLocalFileFromConfigPath(String path) {
         if (path.startsWith("http://") || path.startsWith("https://")) {
             String safePath = path.replaceAll("[^a-zA-Z0-9.-]", "_");
-            return lazyGetLocalFile(safePath, checksum(path), () -> fetchUrlContent(path));
+            return lazyGetLocalFile(safePath, checksum(path), () -> fetchUrlContent(path), Map.of());
         } else {
             Path f = Paths.get(path);
             if (Files.isRegularFile(f)) {
@@ -97,7 +99,7 @@ public final class ConfigFileExtractor {
         }
     }
 
-    private Path lazyGetLocalFile(String path, String checksum, Supplier<String> supplier) {
+    private Path lazyGetLocalFile(String path, String checksum, Supplier<String> supplier, Map<String, String> variables) {
         Path madaConfigDir = gradleHomeDir.resolve("mada-data");
         try {
             int nameIndex = path.lastIndexOf('/');
@@ -120,7 +122,12 @@ public final class ConfigFileExtractor {
             Files.createDirectories(configDir);
             Files.deleteIfExists(targetFile);
 
-            Files.writeString(targetFile, supplier.get());
+            String text = supplier.get();
+            for (var e : variables.entrySet()) {
+                text = text.replace("@" + e.getKey() + "@", e.getValue());
+            }
+            
+            Files.writeString(targetFile, text);
             Files.createFile(markerFile);
 
             return targetFile;

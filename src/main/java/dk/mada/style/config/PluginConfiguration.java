@@ -44,6 +44,8 @@ public class PluginConfiguration {
     public record CheckstyleConfiguration(boolean enabled, List<String> includes, List<String> excludes, boolean ignoreFailures,
             boolean ignoreTestSource,
             boolean ignoreGeneratedSource,
+            @Nullable String testSuppressionFiles,
+            @Nullable String testSuppressionChecks,
             @Nullable String toolVersion,
             @Nullable String configPath) {
     }
@@ -110,6 +112,8 @@ public class PluginConfiguration {
                 getBoolProperty("checkstyle.ignore-failures", true),
                 getBoolProperty("checkstyle.ignore-test-source", false),
                 getBoolProperty("checkstyle.ignore-generated-source", false),
+                getProperty("checkstyle.test-suppressions.files", "dk/.*/(accept|fixture|unit)/.*java"),
+                getProperty("checkstyle.test-suppressions.checks", "(Javadoc|LineLength|MagicNumber)"),
                 getNullableProperty("checkstyle.tool-version", null),
                 getNullableProperty("checkstyle.config-path", null));
 
