@@ -3,8 +3,9 @@
     "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
     "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
-    <!-- More leniency for test sources
-      checks 
-    -->
-    <suppress checks="MagicNumber" files=".*java" />
+    <!-- More leniency for test sources -->
+<!--    <suppress checks=".*Javadoc.*" files="dk[\\/]mada[\\/]accept[\\/].*java" />
+    <suppress checks="MagicNumber" files=".*[\\/]src[\\/]test[\\/].*java" />
+-->
+    <suppress checks="LineLength"  files="dk[\\/]mada[\\/]fixture[\\/].*java" />
 </suppressions>
