@@ -117,7 +117,7 @@ Note that this is a plugin to ErrorProne, so is also affected by errorprone conf
  Comma-separated list of packages to be scanned (will include sub-packages)
 * `dk.mada.style.null-checker.exclude-packages = `  
  Comma-separated list of packages to be excluded from scanning
-* `dk.mada.style.null-checker.exclude-field-annotations = javafx.fxml.FXML`  
+* `dk.mada.style.null-checker.exclude-field-annotations = javafx.fxml.FXML, org.junit.jupiter.api.io.TempDir`  
  Comma-separated list of classes that are assumed to inject (non-null) value into fields
 
 

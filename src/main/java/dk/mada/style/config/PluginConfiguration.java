@@ -135,7 +135,7 @@ public class PluginConfiguration {
                 getBoolProperty("null-checker.enabled", true),
                 getProperty("null-checker.include-packages", "dk"),
                 getProperty("null-checker.exclude-packages", ""),
-                getProperty("null-checker.exclude-field-annotations", ""));
+                getProperty("null-checker.exclude-field-annotations", "javafx.fxml.FXML, org.junit.jupiter.api.io.TempDir"));
 
         sonarConf = new SonarConfiguration(
                 getBoolProperty("sonar.enabled", true),
@@ -230,5 +230,4 @@ public class PluginConfiguration {
                 .map(String::trim)
                 .toList();
     }
-
 }
