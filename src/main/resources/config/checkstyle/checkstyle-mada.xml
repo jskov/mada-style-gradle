@@ -50,9 +50,9 @@
   </module>
 
   <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
+  <!-- Note that config_log is set via the plugin's configDirectory -->
   <module name="SuppressionFilter">
-    <property name="file" value="${org.checkstyle.sun.suppressionfilter.config}"
-              default="checkstyle-suppressions.xml" />
+    <property name="file" value="${config_loc}/suppressions-mada.xml" />
     <property name="optional" value="true"/>
   </module>
 

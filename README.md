@@ -62,7 +62,7 @@ The options are (shows here with their default value).
 
 **Checkstyle**
 
-By default uses [this configuration](./src/main/resources/config/checkstyle/checkstyle-mada.xml)
+By default uses [this configuration](./src/main/resources/config/checkstyle/checkstyle-mada.xml) and [these suppressions](./src/main/resources/config/checkstyle/suppressions-mada.xml)
 
 * `dk.mada.style.checkstyle.enabled = true`  
  Boolean flag allowing the checkstyle checker to be disabled
@@ -77,7 +77,9 @@ By default uses [this configuration](./src/main/resources/config/checkstyle/chec
 * `dk.mada.style.checkstyle.config-path = null`  
  Optional path to an alternative checkstyle configuration file  
  This can be a URL; the content will be downloaded and cached (so if you want to update the content, you must change the URL)
+ Note that the configDir is set to the folder where the mada config and suppressions files are stored.
 
+The suppressions file is hardwired for now, matching files `dk/.*/(accept|fixture|unit)/.*java` and checks `(Javadoc|LineLength|MagicNumber)`.
 
 **ErrorProne**
 
