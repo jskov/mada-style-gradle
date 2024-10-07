@@ -45,8 +45,8 @@ dependencies {
 processResources {
     // Checksum each configuration file so it is easy for the plugin to reason about their state
     filesMatching('config/datafile-checksums.properties') {
-        def eclipseFormatterMadaChecksum = digest(file('src/main/resources/config/spotless/eclipse-formatter-mada.xml'))
-        def checkstyleMadaChecksum = digest(file('src/main/resources/config/checkstyle/checkstyle-mada.xml'))
+        def eclipseFormatterMadaChecksum = digestFiles([file('src/main/resources/config/spotless/eclipse-formatter-mada.xml')])
+        def checkstyleMadaChecksum = digestFiles([file('src/main/resources/config/checkstyle/checkstyle-mada.xml'), file('src/main/resources/config/checkstyle/suppressions-mada.xml')])
         filter { l -> l.replace('@ECLIPSE_FORMATTER_MADA@', eclipseFormatterMadaChecksum)
                         .replace('@CHECKSTYLE_MADA@',  checkstyleMadaChecksum) }
     }
@@ -111,8 +111,11 @@ project.afterEvaluate { p ->
 
 tasks.eclipse.doLast { project.mkdir("build/pluginUnderTestMetadata") }
 
-String digest(File f) {
-    byte[] b = f.readBytes()
-    byte[] d = java.security.MessageDigest.getInstance("SHA-256").digest(b)
-    return java.util.HexFormat.of().formatHex(d)
+String digestFiles(List<File> files) {
+    def digester = java.security.MessageDigest.getInstance("MD5")
+    for (File f : files) {
+        byte[] b = f.readBytes()
+        digester.update(b)
+    }
+    return java.util.HexFormat.of().formatHex(digester.digest())
 }

@@ -100,18 +100,24 @@ public final class ConfigFileExtractor {
     private Path lazyGetLocalFile(String path, String checksum, Supplier<String> supplier) {
         Path madaConfigDir = gradleHomeDir.resolve("mada-data");
         try {
-            String suffix = path.substring(path.lastIndexOf('.'));
-            String filename = path.replace('/', ':').replace(suffix, "") + "-" + checksum + suffix;
+            int nameIndex = path.lastIndexOf('/');
+            String dirname = path.substring(0, nameIndex);
+            if (dirname.startsWith("/")) {
+                dirname = dirname.substring(1);
+            }
+            String filename = path.substring(nameIndex + 1);
 
-            Path targetFile = madaConfigDir.resolve(filename);
-            Path markerFile = madaConfigDir.resolve(filename + ".valid");
+            Path configDir = madaConfigDir.resolve(dirname).resolve(checksum);
+
+            Path targetFile = configDir.resolve(filename);
+            Path markerFile = configDir.resolve(filename + ".valid");
             if (Files.exists(markerFile)) {
                 logger.debug("Already have config file {} : {}", path, targetFile);
                 return targetFile;
             }
             logger.debug("Missing config file {}, fetching...", path);
 
-            Files.createDirectories(madaConfigDir);
+            Files.createDirectories(configDir);
             Files.deleteIfExists(targetFile);
 
             Files.writeString(targetFile, supplier.get());
