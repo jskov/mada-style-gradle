@@ -67,9 +67,9 @@ public class SpotlessConfigurator {
         EclipseConfig eclipseConfig = je.eclipse();
         eclipseConfig.configFile(configFile);
 
-        String p2Mirror = formatterConfig.eclipse429P2mirror();
+        String p2Mirror = formatterConfig.eclipse432P2mirror();
         if (p2Mirror != null) {
-            eclipseConfig.withP2Mirrors(Map.of("https://download.eclipse.org/eclipse/updates/4.29/", p2Mirror));
+            eclipseConfig.withP2Mirrors(Map.of("https://download.eclipse.org/eclipse/updates/4.32/", p2Mirror));
         }
 
         je.formatAnnotations(); // Note that this *must* come after the java formatter configuration
