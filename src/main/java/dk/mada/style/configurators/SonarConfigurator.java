@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.plugins.PluginContainer;
 import org.gradle.api.plugins.quality.Checkstyle;
 import org.gradle.api.plugins.quality.CheckstylePlugin;
 import org.gradle.api.tasks.TaskContainer;
@@ -49,16 +50,14 @@ public class SonarConfigurator {
         logger.info("dk.mada.style configure sonar");
 
         TaskContainer taskContainer = project.getTasks();
+        PluginContainer plugins = project.getPlugins();
 
         // Make sonar depend on some other check tasks (we want sonar to run last)
-        project.afterEvaluate(p -> taskContainer.withType(SonarTask.class, sonar -> {
-            if (project.getPlugins().hasPlugin(CheckstylePlugin.class)) {
-                taskContainer.withType(Checkstyle.class, sonar::dependsOn);
-            }
-            if (project.getPlugins().hasPlugin(JacocoPlugin.class)) {
-                taskContainer.withType(JacocoReport.class, sonar::dependsOn);
-            }
-        }));
+        taskContainer.withType(SonarTask.class, sonarTask -> {
+            plugins.withType(CheckstylePlugin.class).whenPluginAdded(p -> taskContainer.withType(Checkstyle.class, sonarTask::dependsOn));
+
+            plugins.withType(JacocoPlugin.class).whenPluginAdded(p -> taskContainer.withType(JacocoReport.class, sonarTask::dependsOn));
+        });
 
         Map<String, String> inputProps = project.getProperties().entrySet().stream()
                 .filter(e -> !e.getKey().equals("dk.mada.style.sonar.enabled"))
