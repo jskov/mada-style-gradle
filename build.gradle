@@ -8,6 +8,13 @@ plugins {
 ext {
     mavenDisplayName = 'Plugin for enforcing java dk.mada coding style'
     mavenDescription = 'A plugin that sets up null-checking and code formatting style for dk.mada development.'
+
+    def configDir = layout.getProjectDirectory().dir('src/main/resources/config')
+    eclipseFormatterConfigFiles = [configDir.file('spotless/eclipse-formatter-mada.xml')]
+    checkstyleConfigFiles = [configDir.file('checkstyle/checkstyle-mada.xml'),
+                             configDir.file('checkstyle/suppressions-mada.xml')]
+
+    errorProneDependencies = project.getProviders().provider(() -> getErrorProneDependencies())
 }
 
 group = 'dk.mada.style'
@@ -44,19 +51,18 @@ dependencies {
 }
 
 tasks.named('processResources').configure {
+    inputs.files(eclipseFormatterConfigFiles)
+    inputs.files(checkstyleConfigFiles)
+    inputs.property('errorProneDeps', errorProneDependencies)
+
     // Checksum each configuration file so it is easy for the plugin to reason about their state
     filesMatching('config/datafile-checksums.properties') {
-        def eclipseFormatterMadaChecksum = digestFiles([file('src/main/resources/config/spotless/eclipse-formatter-mada.xml')])
-        def checkstyleMadaChecksum = digestFiles([file('src/main/resources/config/checkstyle/checkstyle-mada.xml'), file('src/main/resources/config/checkstyle/suppressions-mada.xml')])
-        filter { l -> l.replace('@ECLIPSE_FORMATTER_MADA@', eclipseFormatterMadaChecksum)
-                        .replace('@CHECKSTYLE_MADA@',  checkstyleMadaChecksum) }
+        filter { l -> l.replace('@ECLIPSE_FORMATTER_MADA@', digestFiles(eclipseFormatterConfigFiles))
+                       .replace('@CHECKSTYLE_MADA@',  digestFiles(checkstyleConfigFiles)) }
     }
     // Provide the plugin with versions for the dependencies it adds to the client build
     filesMatching('config/datafile-dependencies.properties') {
-        def depVersions = configurations.addedDependencies.collect { f ->
-            f.toString().replaceAll(".*files-2.1/", "").replaceFirst("/", "\\\\:").replaceFirst("/", "=").replaceAll("/.*", "")
-        }.join('\n')
-        filter { l -> l.replace('@DEPENDENCIES@', depVersions) }
+        filter { l -> l.replace('@DEPENDENCIES@', errorProneDependencies) }
     }
 }
 
@@ -114,11 +120,17 @@ tasks.named('eclipse').configure {
     doLast { project.mkdir("build/pluginUnderTestMetadata") }
 }
 
-String digestFiles(List<File> files) {
+String digestFiles(List<RegularFile> files) {
     def digester = java.security.MessageDigest.getInstance("MD5")
-    for (File f : files) {
-        byte[] b = f.readBytes()
+    for (RegularFile f : files) {
+        byte[] b = f.getAsFile().readBytes()
         digester.update(b)
     }
     return java.util.HexFormat.of().formatHex(digester.digest())
+}
+
+String getErrorProneDependencies() {
+    return project.configurations.addedDependencies.collect { f ->
+            f.toString().replaceAll(".*files-2.1/", "").replaceFirst("/", "\\\\:").replaceFirst("/", "=").replaceAll("/.*", "")
+        }.join('\n')
 }
