@@ -68,10 +68,10 @@ public class PluginConfiguration {
      * @param includes           Ant-style patterns for sources to format
      * @param excludes           Ant-style patterns for sources to ignore
      * @param eclipseConfigPath  an optional path to an eclipse configuration file
-     * @param eclipse432P2mirror an optional URL to a eclipse update P2 repository
+     * @param eclipse434P2mirror an optional URL to a eclipse update P2 repository
      */
     public record FormatterConfiguration(boolean enabled, List<String> includes, List<String> excludes, @Nullable String eclipseConfigPath,
-            @Nullable String eclipse432P2mirror) {
+            @Nullable String eclipse434P2mirror) {
     }
 
     /**
@@ -124,12 +124,17 @@ public class PluginConfiguration {
                         // The time zone is not relevant
                         + "JavaTimeDefaultTimeZone"));
 
+        @Nullable String oldEclipseP2UrlConfig = getNullableProperty("formatter.eclipse-432-p2-url", null);
+        if (oldEclipseP2UrlConfig != null) {
+            throw new IllegalArgumentException("You should specify formatter.eclipse-434-p2-url instead!");
+        }
+
         formatterConf = new FormatterConfiguration(
                 getBoolProperty("formatter.enabled", true),
                 getListProperty("formatter.include", List.of("src/main/java/**/*.java", "src/test/java/**/*.java")),
                 getListProperty("formatter.exclude", List.of()),
                 getNullableProperty("formatter.eclipse-config-path", null),
-                getNullableProperty("formatter.eclipse-432-p2-url", null));
+                getNullableProperty("formatter.eclipse-434-p2-url", null));
 
         nullcheckerConf = new NullcheckerConfiguration(
                 getBoolProperty("null-checker.enabled", true),
