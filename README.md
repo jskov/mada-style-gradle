@@ -106,8 +106,8 @@ By default uses [this configuration](./src/main/resources/config/spotless/eclips
 * `dk.mada.style.formatter.eclipse-config-path = null`  
  Optional path to an alternative eclipse formatter configuration file
  This can be a URL; the content will be downloaded and cached (so if you want to update the content, you must change the URL)
-* `dk.mada.style.formatter.eclipse-432-p2-url = null`
- Optional URL to a P2 update repository containing Eclipse 4.32 (aka 2024.06) plugins.
+* `dk.mada.style.formatter.eclipse-434-p2-url = null`
+ Optional URL to a P2 update repository containing Eclipse 4.34 (aka 2024.12) plugins.
 
 **Null-checker**
 
