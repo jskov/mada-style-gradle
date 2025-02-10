@@ -1,13 +1,10 @@
 package dk.mada.style.configurators;
 
-import java.util.List;
-
-import org.gradle.api.logging.Logger;
-
 import com.diffplug.gradle.spotless.JavaExtension;
 import com.diffplug.gradle.spotless.SpotlessExtension;
-
 import dk.mada.style.config.PluginConfiguration.FormatterConfiguration;
+import java.util.List;
+import org.gradle.api.logging.Logger;
 
 /**
  * Configures Spotless with formatter preferences.

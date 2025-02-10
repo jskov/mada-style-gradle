@@ -1,8 +1,9 @@
 package dk.mada.style.configurators;
 
+import dk.mada.style.config.ConfigFileExtractor;
+import dk.mada.style.config.PluginConfiguration.CheckstyleConfiguration;
 import java.nio.file.Path;
 import java.util.Objects;
-
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.Directory;
@@ -10,9 +11,6 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.quality.Checkstyle;
 import org.gradle.api.plugins.quality.CheckstyleExtension;
 import org.gradle.api.tasks.TaskContainer;
-
-import dk.mada.style.config.ConfigFileExtractor;
-import dk.mada.style.config.PluginConfiguration.CheckstyleConfiguration;
 
 /**
  * Configures Checkstyle with preferences.
@@ -40,7 +38,8 @@ public class CheckstyleConfigurator {
      * @param checkstyleConfig the checkstyle configuration
      * @param configExtractor  the configuration extractor
      */
-    public CheckstyleConfigurator(Project project, CheckstyleConfiguration checkstyleConfig, ConfigFileExtractor configExtractor) {
+    public CheckstyleConfigurator(
+            Project project, CheckstyleConfiguration checkstyleConfig, ConfigFileExtractor configExtractor) {
         this.logger = project.getLogger();
         this.project = project;
         this.checkstyleConfig = checkstyleConfig;
@@ -94,7 +93,9 @@ public class CheckstyleConfigurator {
      * @return the Gradle Directory
      */
     private Directory toGradleDir(Path dir) {
-        return project.getLayout().getProjectDirectory().dir(dir.toAbsolutePath().toString());
+        return project.getLayout()
+                .getProjectDirectory()
+                .dir(dir.toAbsolutePath().toString());
     }
 
     private void disableTask(Task t) {

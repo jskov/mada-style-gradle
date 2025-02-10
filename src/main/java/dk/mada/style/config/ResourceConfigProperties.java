@@ -9,6 +9,7 @@ import java.util.Properties;
  */
 public final class ResourceConfigProperties {
     private ResourceConfigProperties() {
+        // empty
     }
 
     /**

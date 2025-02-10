@@ -18,7 +18,6 @@ import java.time.Duration;
 import java.util.HexFormat;
 import java.util.Properties;
 import java.util.function.Supplier;
-
 import org.gradle.api.logging.Logger;
 
 /**
@@ -147,7 +146,8 @@ public final class ConfigFileExtractor {
                     .followRedirects(Redirect.NORMAL)
                     .connectTimeout(DOWNLOAD_CONNECT_TIMEOUT)
                     .build();
-            HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(url)).build();
+            HttpRequest request =
+                    HttpRequest.newBuilder().GET().uri(URI.create(url)).build();
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
             return response.body();
         } catch (InterruptedException e) {
