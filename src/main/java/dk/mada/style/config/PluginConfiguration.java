@@ -3,7 +3,6 @@ package dk.mada.style.config;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
 import org.gradle.api.Project;
 import org.jspecify.annotations.Nullable;
 
@@ -41,12 +40,15 @@ public class PluginConfiguration {
      * @param toolVersion           an optional checkstyle version to use
      * @param configPath            an optional path to a checkstyle configuration file
      */
-    public record CheckstyleConfiguration(boolean enabled, List<String> includes, List<String> excludes, boolean ignoreFailures,
+    public record CheckstyleConfiguration(
+            boolean enabled,
+            List<String> includes,
+            List<String> excludes,
+            boolean ignoreFailures,
             boolean ignoreTestSource,
             boolean ignoreGeneratedSource,
             @Nullable String toolVersion,
-            @Nullable String configPath) {
-    }
+            @Nullable String configPath) {}
 
     /**
      * ErrorProne configuration.
@@ -57,9 +59,12 @@ public class PluginConfiguration {
      * @param excludePathsRegexp    a regular expression of source paths to ignore
      * @param disabledRules         a comma-separated list of rule names to disable
      */
-    public record ErrorProneConfiguration(boolean enabled, boolean ignoreTestSource, boolean ignoreGeneratedSource,
-            String excludePathsRegexp, String disabledRules) {
-    }
+    public record ErrorProneConfiguration(
+            boolean enabled,
+            boolean ignoreTestSource,
+            boolean ignoreGeneratedSource,
+            String excludePathsRegexp,
+            String disabledRules) {}
 
     /**
      * Formatter configuration.
@@ -68,8 +73,7 @@ public class PluginConfiguration {
      * @param includes Ant-style patterns for sources to format
      * @param excludes Ant-style patterns for sources to ignore
      */
-    public record FormatterConfiguration(boolean enabled, List<String> includes, List<String> excludes) {
-    }
+    public record FormatterConfiguration(boolean enabled, List<String> includes, List<String> excludes) {}
 
     /**
      * Null-checker configuration.
@@ -79,9 +83,8 @@ public class PluginConfiguration {
      * @param excludePackages          a comma-separated list of packages to ignore (restricted regexp syntax)
      * @param excludedFieldAnnotations a comma-seaparated list of classes to ignore (restricted regexp syntax)
      */
-    public record NullcheckerConfiguration(boolean enabled, String includePackages, String excludePackages,
-            String excludedFieldAnnotations) {
-    }
+    public record NullcheckerConfiguration(
+            boolean enabled, String includePackages, String excludePackages, String excludedFieldAnnotations) {}
 
     /**
      * SonarSource sonar configuration.
@@ -89,8 +92,7 @@ public class PluginConfiguration {
      * @param enabled                  flag to activate sonar
      * @param madaConventionProperties convention properties for sonar
      */
-    public record SonarConfiguration(boolean enabled, Map<String, String> madaConventionProperties) {
-    }
+    public record SonarConfiguration(boolean enabled, Map<String, String> madaConventionProperties) {}
 
     /**
      * Creates a new instance.
@@ -115,11 +117,13 @@ public class PluginConfiguration {
                 getBoolProperty("errorprone.ignore-test-source", false),
                 getBoolProperty("errorprone.ignore-generated-source", false),
                 getProperty("errorprone.excluded-paths-regexp", ""),
-                getProperty("errorprone.disabled-rules", ""
-                        // https://github.com/google/error-prone/issues/1542 (Set.of - possible records problem)
-                        + "ImmutableEnumChecker,"
-                        // The time zone is not relevant
-                        + "JavaTimeDefaultTimeZone"));
+                getProperty(
+                        "errorprone.disabled-rules",
+                        ""
+                                // https://github.com/google/error-prone/issues/1542 (Set.of - possible records problem)
+                                + "ImmutableEnumChecker,"
+                                // The time zone is not relevant
+                                + "JavaTimeDefaultTimeZone"));
 
         @Nullable String oldEclipseP2UrlConfig = getNullableProperty("formatter.eclipse-432-p2-url", null);
         if (oldEclipseP2UrlConfig != null) {
@@ -135,7 +139,9 @@ public class PluginConfiguration {
                 getBoolProperty("null-checker.enabled", true),
                 getProperty("null-checker.include-packages", "dk"),
                 getProperty("null-checker.exclude-packages", ""),
-                getProperty("null-checker.exclude-field-annotations", "javafx.fxml.FXML, org.junit.jupiter.api.io.TempDir"));
+                getProperty(
+                        "null-checker.exclude-field-annotations",
+                        "javafx.fxml.FXML, org.junit.jupiter.api.io.TempDir"));
 
         sonarConf = new SonarConfiguration(
                 getBoolProperty("sonar.enabled", true),
@@ -226,8 +232,6 @@ public class PluginConfiguration {
         if (value == null) {
             return defaultValue;
         }
-        return Stream.of(value.split(",", -1))
-                .map(String::trim)
-                .toList();
+        return Stream.of(value.split(",", -1)).map(String::trim).toList();
     }
 }
