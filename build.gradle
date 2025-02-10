@@ -10,7 +10,6 @@ ext {
     mavenDescription = 'A plugin that sets up null-checking and code formatting style for dk.mada development.'
 
     def configDir = layout.getProjectDirectory().dir('src/main/resources/config')
-    eclipseFormatterConfigFiles = [configDir.file('spotless/eclipse-formatter-mada.xml')]
     checkstyleConfigFiles = [configDir.file('checkstyle/checkstyle-mada.xml'),
                              configDir.file('checkstyle/suppressions-mada.xml')]
 
@@ -51,14 +50,12 @@ dependencies {
 }
 
 tasks.named('processResources').configure {
-    inputs.files(eclipseFormatterConfigFiles)
     inputs.files(checkstyleConfigFiles)
     inputs.property('errorProneDeps', errorProneDependencies)
 
     // Checksum each configuration file so it is easy for the plugin to reason about their state
     filesMatching('config/datafile-checksums.properties') {
-        filter { l -> l.replace('@ECLIPSE_FORMATTER_MADA@', digestFiles(eclipseFormatterConfigFiles))
-                       .replace('@CHECKSTYLE_MADA@',  digestFiles(checkstyleConfigFiles)) }
+        filter { l -> l.replace('@CHECKSTYLE_MADA@',  digestFiles(checkstyleConfigFiles)) }
     }
     // Provide the plugin with versions for the dependencies it adds to the client build
     filesMatching('config/datafile-dependencies.properties') {

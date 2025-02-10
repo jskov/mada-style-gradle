@@ -50,7 +50,7 @@ public final class MadaStylePlugin implements Plugin<Project> {
         if (configuration.isFormatterActive()) {
             project.getPluginManager().apply("com.diffplug.spotless");
 
-            project.getPlugins().withType(SpotlessPlugin.class, sp -> lazyConfigureFormatter(project, configuration, configExtractor));
+            project.getPlugins().withType(SpotlessPlugin.class, sp -> lazyConfigureFormatter(project, configuration));
         }
 
         if (configuration.isNullcheckerActive() || configuration.isErrorProneActive()) {
@@ -86,13 +86,12 @@ public final class MadaStylePlugin implements Plugin<Project> {
     /**
      * Hook spotless configuration on activation of its extension. It only gets configured on task activation.
      *
-     * @param project         the project
-     * @param configuration   the plugin configuration
-     * @param configExtractor the configuration extractor
+     * @param project       the project
+     * @param configuration the plugin configuration
      */
-    private void lazyConfigureFormatter(Project project, PluginConfiguration configuration, ConfigFileExtractor configExtractor) {
+    private void lazyConfigureFormatter(Project project, PluginConfiguration configuration) {
         project.getExtensions().configure(SpotlessExtension.class,
-                se -> new SpotlessConfigurator(project.getLogger(), configuration.formatter(), configExtractor).configure(se));
+                se -> new SpotlessConfigurator(project.getLogger(), configuration.formatter()).configure(se));
     }
 
     /**
