@@ -48,7 +48,7 @@ Remove all the `dk.mada.style.`-prefixed entries in `gradle.properties` if you w
 * [ErrorProne](https://plugins.gradle.org/plugin/net.ltgt.errorprone): Error checking framework
 * [NullAway](https://github.com/uber/NullAway): ErrorProne plugin
 * [Sonar](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-gradle/): SonarScanner
-* [Spotless](https://plugins.gradle.org/plugin/com.diffplug.spotless): Enforces the eclipse-base dk.mada code formatter
+* [Spotless](https://plugins.gradle.org/plugin/com.diffplug.spotless): Enforces the [Palantir](https://github.com/palantir/palantir-java-format) code formatter
 
 
 ## Configuration
@@ -95,19 +95,12 @@ The suppressions file is hardwired for now, matching files `dk/.*/(accept|fixtur
 
 **Formatter (Spotless)**
 
-By default uses [this configuration](./src/main/resources/config/spotless/eclipse-formatter-mada.xml)
-
 * `dk.mada.style.formatter.enabled = true`  
  Boolean flag allowing the formatter to be disabled
 * `dk.mada.style.formatter.include = src/main/java/**/*.java, src/test/java/**/*.java`  
  Comma-separated Ant-style include patterns for files to format
 * `dk.mada.style.formatter.exclude = `  
  Comma-separated Ant-style exclude patterns for files to not format
-* `dk.mada.style.formatter.eclipse-config-path = null`  
- Optional path to an alternative eclipse formatter configuration file
- This can be a URL; the content will be downloaded and cached (so if you want to update the content, you must change the URL)
-* `dk.mada.style.formatter.eclipse-434-p2-url = null`
- Optional URL to a P2 update repository containing Eclipse 4.34 (aka 2024.12) plugins.
 
 **Null-checker**
 
