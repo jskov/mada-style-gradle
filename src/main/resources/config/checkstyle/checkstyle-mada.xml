@@ -155,7 +155,10 @@
     <module name="ParenPad"/>
     <module name="TypecastParenPad"/>
     <module name="WhitespaceAfter"/>
-    <module name="WhitespaceAround"/>
+    <module name="WhitespaceAround">
+        <!-- Allow recors with empty body -->
+        <property name="allowEmptyTypes" value="true" />
+    </module>
 
     <!-- Modifier Checks                                    -->
     <!-- See https://checkstyle.org/config_modifier.html -->
