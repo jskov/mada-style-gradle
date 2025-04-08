@@ -8,5 +8,5 @@ nullaway            = { module = "com.uber.nullaway:nullaway", version = "0.12.6
 
 sonarPlugin         = { module = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin", version = "6.1.0.5360" }
 
-spotlessPlugin      = { module = "com.diffplug.spotless:spotless-plugin-gradle", version = "7.0.2" }
+spotlessPlugin      = { module = "com.diffplug.spotless:spotless-plugin-gradle", version = "7.0.3" }
 
