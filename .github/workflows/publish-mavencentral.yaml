@@ -32,7 +32,7 @@ jobs:
           BUILD_LABEL: ${{ github.head_ref || github.ref_name }}
 
       - name: Upload and Release Bundle
-        uses: jskov/action-nexus-publish@3b0ad3ac68d08dd223f751ec216ab89dc86a4645
+        uses: jskov/action-nexus-publish@ec5b776d2313139e3235e40bc9ad1a570498442c
         # v1.1
         with:
           portal_username: ${{ secrets.PORTAL_USERNAME }}
