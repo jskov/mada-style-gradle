@@ -19,7 +19,7 @@ public final class ResourceConfigProperties {
      * @return the read properties
      */
     public static Properties readConfigProperties(String name) {
-        try (InputStream is = ConfigFileExtractor.class.getResourceAsStream(name)) {
+        try (InputStream is = ResourceConfigProperties.class.getResourceAsStream(name)) {
             if (is == null) {
                 throw new IllegalStateException("Failed to find resource " + name);
             }
