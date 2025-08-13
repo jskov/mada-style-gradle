@@ -8,6 +8,7 @@ import dk.mada.style.configurators.CheckstyleConfigurator;
 import dk.mada.style.configurators.ErrorProneConfigurator;
 import dk.mada.style.configurators.SonarConfigurator;
 import dk.mada.style.configurators.SpotlessConfigurator;
+import java.io.File;
 import net.ltgt.gradle.errorprone.ErrorPronePlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -40,9 +41,12 @@ public final class MadaStylePlugin implements Plugin<Project> {
         Logger logger = project.getLogger();
         logger.info("Applying mada.style plugin");
 
+        File gradleHomeDir = project.getGradle().getGradleHomeDir();
+        if (gradleHomeDir == null) {
+            gradleHomeDir = project.getLayout().getBuildDirectory().getAsFile().get();
+        }
         var configuration = new PluginConfiguration(project);
-        var configExtractor = new ConfigFileExtractor(
-                logger, project.getGradle().getGradleHomeDir().toPath());
+        var configExtractor = new ConfigFileExtractor(logger, gradleHomeDir.toPath());
 
         if (configuration.isCheckstyleActive()) {
             project.getPluginManager().apply("checkstyle");
