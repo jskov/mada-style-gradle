@@ -51,7 +51,7 @@ public final class ConfigFileExtractor {
      * Constructs a new instance.
      *
      * @param logger        the gradle logger
-     * @param gradleHomeDir the gradle home dir
+     * @param gradleHomeDir the gradle home dir for persistent storage
      */
     public ConfigFileExtractor(Logger logger, Path gradleHomeDir) {
         this.logger = logger;
