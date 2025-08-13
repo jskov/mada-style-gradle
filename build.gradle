@@ -10,8 +10,9 @@ ext {
     mavenDescription = 'A plugin that sets up null-checking and code formatting style for dk.mada development.'
 
     def configDir = layout.getProjectDirectory().dir('src/main/resources/config')
-    checkstyleConfigFiles = [configDir.file('checkstyle/checkstyle-mada.xml'),
-                             configDir.file('checkstyle/suppressions-mada.xml')]
+    checkstyleConfigFiles = objects.listProperty(RegularFile.class)
+        .convention([configDir.file('checkstyle/checkstyle-mada.xml'),
+                     configDir.file('checkstyle/suppressions-mada.xml')])
 
     errorProneDependencies = project.getProviders().provider(() -> getErrorProneDependencies())
 }
@@ -50,16 +51,20 @@ dependencies {
 }
 
 tasks.named('processResources').configure {
-    inputs.files(checkstyleConfigFiles)
-    inputs.property('errorProneDeps', errorProneDependencies)
+    def capturedCheckstyleConfigFiles = checkstyleConfigFiles
+    def capturedErrorProneDependencies = errorProneDependencies
+    def digest = digestFiles(capturedCheckstyleConfigFiles.get())
+
+    inputs.files(capturedCheckstyleConfigFiles)
+    inputs.property('errorProneDeps', capturedErrorProneDependencies)
 
     // Checksum each configuration file so it is easy for the plugin to reason about their state
     filesMatching('config/datafile-checksums.properties') {
-        filter { l -> l.replace('@CHECKSTYLE_MADA@',  digestFiles(checkstyleConfigFiles)) }
+        filter { l -> l.replace('@CHECKSTYLE_MADA@',  digest) }
     }
     // Provide the plugin with versions for the dependencies it adds to the client build
     filesMatching('config/datafile-dependencies.properties') {
-        filter { l -> l.replace('@DEPENDENCIES@', errorProneDependencies) }
+        filter { l -> l.replace('@DEPENDENCIES@', capturedErrorProneDependencies) }
     }
 }
 
