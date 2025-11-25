@@ -6,7 +6,7 @@ jspecify            = { module = "org.jspecify:jspecify", version = "1.0.0" }
 
 nullaway            = { module = "com.uber.nullaway:nullaway", version = "0.12.12" }
 
-sonarPlugin         = { module = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin", version = "7.0.1.6134" }
+sonarPlugin         = { module = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin", version = "7.1.0.6387" }
 
 spotlessPlugin      = { module = "com.diffplug.spotless:spotless-plugin-gradle", version = "8.0.0" }
 
