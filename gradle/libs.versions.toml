@@ -4,7 +4,7 @@ errorproneCore      = { module = "com.google.errorprone:error_prone_core", versi
 
 jspecify            = { module = "org.jspecify:jspecify", version = "1.0.0" }
 
-nullaway            = { module = "com.uber.nullaway:nullaway", version = "0.12.14" }
+nullaway            = { module = "com.uber.nullaway:nullaway", version = "0.12.15" }
 
 sonarPlugin         = { module = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin", version = "7.2.1.6560" }
 
