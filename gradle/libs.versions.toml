@@ -1,6 +1,6 @@
 [libraries]
 errorpronePlugin    = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version = "5.1.0" }
-errorproneCore      = { module = "com.google.errorprone:error_prone_core", version = "2.48.0" }
+errorproneCore      = { module = "com.google.errorprone:error_prone_core", version = "2.49.0" }
 
 jspecify            = { module = "org.jspecify:jspecify", version = "1.0.0" }
 
