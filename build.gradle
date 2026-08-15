@@ -1,7 +1,6 @@
 plugins {
     id 'com.gradle.plugin-publish' version '2.1.1'
-    id 'eclipse'
-    id 'dk.mada.style' version '1.2.1'
+    id 'dk.mada.style' version '1.2.4'
 }
 
 ext {
@@ -121,10 +120,6 @@ project.afterEvaluate { p ->
             url = 'https://github.com/jskov/mada-style-gradle/'
         }
     }
-}
-
-tasks.named('eclipse').configure {
-    doLast { project.mkdir("build/pluginUnderTestMetadata") }
 }
 
 String digestFiles(List<RegularFile> files) {
