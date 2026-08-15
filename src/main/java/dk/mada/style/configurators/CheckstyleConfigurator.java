@@ -99,7 +99,7 @@ public class CheckstyleConfigurator {
     }
 
     private void disableTask(Task t) {
-        t.setOnlyIf("disabled by mada style", ta -> false);
+        t.setOnlyIf("disabled by mada style", _ -> false);
     }
 
     private Path getActiveConfigfile() {

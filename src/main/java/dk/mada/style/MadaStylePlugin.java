@@ -28,13 +28,9 @@ public final class MadaStylePlugin implements Plugin<Project> {
         // Explicit default constructor to avoid javadoc warning
     }
 
-    void foo() {
-        // empty
-    }
-
     @Override
     public void apply(Project project) {
-        project.getPlugins().withType(JavaPlugin.class, jp -> applyPlugins(project));
+        project.getPlugins().withType(JavaPlugin.class, _ -> applyPlugins(project));
     }
 
     private void applyPlugins(Project project) {
@@ -54,19 +50,19 @@ public final class MadaStylePlugin implements Plugin<Project> {
             project.getPlugins()
                     .withType(
                             CheckstylePlugin.class,
-                            cp -> lazyConfigureCheckstyle(project, configuration, configExtractor));
+                            _ -> lazyConfigureCheckstyle(project, configuration, configExtractor));
         }
 
         if (configuration.isFormatterActive()) {
             project.getPluginManager().apply("com.diffplug.spotless");
 
-            project.getPlugins().withType(SpotlessPlugin.class, sp -> lazyConfigureFormatter(project, configuration));
+            project.getPlugins().withType(SpotlessPlugin.class, _ -> lazyConfigureFormatter(project, configuration));
         }
 
         if (configuration.isNullcheckerActive() || configuration.isErrorProneActive()) {
             project.getPluginManager().apply("net.ltgt.errorprone");
 
-            project.getPlugins().withType(ErrorPronePlugin.class, ep -> new ErrorProneConfigurator(
+            project.getPlugins().withType(ErrorPronePlugin.class, _ -> new ErrorProneConfigurator(
                             project, configuration.errorProne(), configuration.nullchecker())
                     .configure());
         }
@@ -78,7 +74,7 @@ public final class MadaStylePlugin implements Plugin<Project> {
 
             project.getPluginManager().apply("org.sonarqube");
 
-            project.getPlugins().withType(SonarQubePlugin.class, sp -> lazyConfigureSonar(project, configuration));
+            project.getPlugins().withType(SonarQubePlugin.class, _ -> lazyConfigureSonar(project, configuration));
         }
     }
 

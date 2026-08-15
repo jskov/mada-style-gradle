@@ -54,10 +54,10 @@ public class SonarConfigurator {
         // Make sonar depend on some other check tasks (we want sonar to run last)
         taskContainer.withType(SonarTask.class, sonarTask -> {
             plugins.withType(CheckstylePlugin.class)
-                    .whenPluginAdded(p -> taskContainer.withType(Checkstyle.class, sonarTask::dependsOn));
+                    .whenPluginAdded(_ -> taskContainer.withType(Checkstyle.class, sonarTask::dependsOn));
 
             plugins.withType(JacocoPlugin.class)
-                    .whenPluginAdded(p -> taskContainer.withType(JacocoReport.class, sonarTask::dependsOn));
+                    .whenPluginAdded(_ -> taskContainer.withType(JacocoReport.class, sonarTask::dependsOn));
         });
 
         // Map<String, String> inputProps =
