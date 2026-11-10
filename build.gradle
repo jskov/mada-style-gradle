@@ -1,6 +1,6 @@
 plugins {
     id 'com.gradle.plugin-publish' version '2.2.1'
-    id 'dk.mada.style' version '1.2.4'
+    id 'dk.mada.style' version '1.2.5'
 }
 
 ext {
